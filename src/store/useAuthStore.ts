@@ -1,30 +1,16 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
-import type { AuthUser, Rol } from "../types/auth"
-
-// uso esta interface hasta que arme los types de usuario
-
-interface User {
-id: number
-name: string
-email: string
-}
-
-interface AuthState {
-user: User | null
-isAuthenticated: boolean
-setAuth: (user: User) => void
-logout: () => void
-}
+import type { AuthUser, AuthState, Rol } from "../types/auth"
 
 export const useAuthStore = create<AuthState>()(
-persist(
-    (set) => ({
-user: null,
-isAuthenticated: false,
-setAuth: (user) => set({ user, isAuthenticated: true }),
-logout: () => set({ user: null, isAuthenticated: false }),
-    }),
-    { name: 'auth-storage' } 
-)
+    persist(
+        (set, get): AuthState => ({
+            user: null,
+            isAuthenticated: false,
+            setAuth: (user: AuthUser) => set ({user, isAuthenticated: true }),
+            logout: ()=> {set({ user: null, isAuthenticated: false}) },
+            hasRole: (rol: Rol) => get().user?.roles.includes(rol) ?? false,    
+        }),
+        {name : "auth-storage"}
+    )
 )

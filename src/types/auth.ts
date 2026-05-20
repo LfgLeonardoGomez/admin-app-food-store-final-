@@ -22,6 +22,6 @@ export interface AuthState{
     user: AuthUser | null
     isAuthenticated: boolean
     setAuth: (user: AuthUser) => void
-    loguout: () => void
+    logout: () => void
     hasRole: (rol:Rol) => boolean
 }
