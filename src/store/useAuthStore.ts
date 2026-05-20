@@ -1,5 +1,6 @@
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { create } from "zustand"
+import { persist } from "zustand/middleware"
+import type { AuthUser, Rol } from "../types/auth"
 
 // uso esta interface hasta que arme los types de usuario
 
