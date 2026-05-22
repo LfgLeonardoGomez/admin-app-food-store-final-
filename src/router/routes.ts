@@ -1,6 +1,10 @@
 export const ROUTES = {
     LOGIN: '/login',
-    
-    PRODUCTS: '/products'
+    DASHBOARD: '/dashboard',
+    CATEGORIAS: '/categorias',
+    INGREDIENTES: '/ingredientes',
+    PRODUCTOS: '/productos',
+    PEDIDOS: '/pedidos',
+    FORBIDDEN: '/forbidden',
 
 }  as const

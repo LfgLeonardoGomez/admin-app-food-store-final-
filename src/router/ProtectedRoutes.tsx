@@ -16,7 +16,7 @@ type Props = {
     allowedRoles: Rol [] //Roles que van a tener acceso 
 }
 
-export const PrivateRoute = ({ allowedRoles }: Props) => {
+export const ProtectedRoute = ({ allowedRoles }: Props) => {
     const { user, hasRole, isLoading } = useAuthStore()
 
     if (isLoading) {
