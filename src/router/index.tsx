@@ -2,13 +2,13 @@ import {Routes, Route, Navigate} from 'react-router-dom'
 
 import { ROUTES } from './routes'
 
-import Login from '../features/auth/pages/login'
+import {LoginPage} from '../modules/auth/pages/LoginPage'
 
 export default function AppRouter() {
 
     return (
         <Routes>
-            <Route path={ROUTES.LOGIN} element={<Login />} />
+            <Route path={ROUTES.LOGIN} element={<LoginPage />} />
         </Routes>
     )
 }
