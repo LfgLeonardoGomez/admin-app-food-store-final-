@@ -37,6 +37,7 @@ export const AppRouter = () => {
                         <Route 
                             element={<ProtectedRoute 
                             allowedRoles={["ADMIN","STOCK","PEDIDOS"]} />}>
+                                <Route path ={ROUTES.DASHBOARD} element={<div>Dashboard</div>}/>
                         </Route>
 
                         {/*Solo ADMIN*/}
