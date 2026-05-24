@@ -15,15 +15,15 @@ import { Sidebar } from "./Sidebar"
 
 export function AppLayout(){
     return (
-        <div className="flex min-h-screen bg-zinc-50">
+        <div className="flex h-screen bg-background">
 
             {/* Columna izquierda - navegacion */}
             <Sidebar />
 
             {/* Columna derecha - header con contenido */}
-            <div className="flex flex-1 flex-col">
+            <div className="flex flex-1 flex-col overflow-hidden">
                 <AdminHeader />
-                <main className="flex-1 px-6 py-8">
+                <main className="flex-1 overflow-y-auto p-xl">
                     <Outlet />
                 </main>
             </div>

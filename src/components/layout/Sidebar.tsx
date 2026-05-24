@@ -15,14 +15,15 @@ type NavItem = {
     label: string
     to: string
     roles: string[]
+    icon: string
 }
 
 const NAV_ITEMS: NavItem[] = [
-    { label: "Dashboard", to: ROUTES.DASHBOARD, roles: ["ADMIN", "STOCK", "PEDIDOS"]},
-    { label: "Categorias", to: ROUTES.CATEGORIAS, roles: ["ADMIN"]},
-    { label: "Ingredientes", to: ROUTES.INGREDIENTES, roles: ["ADMIN"]},
-    { label: "Productos", to: ROUTES.PRODUCTOS, roles: ["ADMIN","STOCK"]},
-    { label: "Pedidos", to: ROUTES.PEDIDOS, roles: ["ADMIN","PEDIDOS"]},
+    { label: "Dashboard", to: ROUTES.DASHBOARD, roles: ["ADMIN", "STOCK", "PEDIDOS"], icon: "grid_view"},
+    { label: "Categorias", to: ROUTES.CATEGORIAS, roles: ["ADMIN"], icon: "category"},
+    { label: "Ingredientes", to: ROUTES.INGREDIENTES, roles: ["ADMIN"], icon: "inventory_2"},
+    { label: "Productos", to: ROUTES.PRODUCTOS, roles: ["ADMIN","STOCK"], icon: "local_pizza"},
+    { label: "Pedidos", to: ROUTES.PEDIDOS, roles: ["ADMIN","PEDIDOS"], icon: "shopping_cart"},
 ]
 
 export function Sidebar(){
@@ -33,26 +34,35 @@ export function Sidebar(){
     )
 
     return (
-        <aside className="flex h-screen w-56 flex-col border-r border-zinc-200 bg-white px-4 py-6">
+        <aside className="flex h-screen w-64 flex-col border-r border-outline-variant bg-surface px-md gap-sm">
 
             {/* Logo / Nombre */}
-            <p className="mb-8 text-lg font-bold text-zinc-900">FoodStore</p>
+            <div className= "flex items-center gap-sm mb-lg px-xs">
+                <div className= "w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center text-on-primary-container">
+                    <span className="material-symbols-outlined">local_pizza</span>
+                </div>
+            </div>
+            <div>
+                <h1 className="text-headline-md font-semibold text-primary">FoodStore</h1>
+                <p className="text-label-sm font-bold text-secondary">Admin Portal</p>
+            </div>
 
             {/* Link de navegacion */}
-            <nav className="flex flex-col gap-1">
+            <nav className="flex flex-col gap-xs flex-1">
                 {itemsVisibles.map((item) => (
                     <NavLink
                         key={item.to}
                         to={item.to}
                         className={({ isActive }) =>
-                        `rounded-lg px-3 py-2 text-sm font-medium trasnsition-colors ${
+                        `flex items-center gap-md p-md rounded-lg transition-all text-label-lg ${
                             isActive
-                                ? "bg-violes-50 text-violet-700"
-                                : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
-                        }`
-                    }
-                >
-                    {item.label}
+                                ? "bg-secondary-container text-on-secondary-container font-bold"
+                                : "text-secondary hover:bg-surface-container-low font-semibold"
+                            }`
+                        }
+                    >
+                        <span className= "material-symbols-outlined">{item.icon}</span>
+                        <span>{item.label}</span>
                     </NavLink>
                 ))}
             </nav>

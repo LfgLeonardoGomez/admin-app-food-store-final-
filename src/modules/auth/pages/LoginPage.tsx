@@ -1,6 +1,7 @@
 import {useState} from "react"
 import {useNavigate} from "react-router-dom"
 import {useAuthStore} from "../../../store/useAuthStore"
+import {ROUTES } from "../../../router/routes"
 
 /**
  * Pagina de inicio de sesion del panel de administracion
@@ -34,7 +35,7 @@ export function LoginPage(){
 
         try{
             await login(email,password)
-            navigate("/dashboard")
+            navigate(ROUTES.DASHBOARD)
         } catch {
             //El store capturo y guardo el error
         } finally {
@@ -43,55 +44,72 @@ export function LoginPage(){
     }
 
     return (
-        <div className= "space-y-6">
-            <h1 className= "text-3xl font-bold">Iniciar Sesion</h1>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-lg">
+            <div className="space-y-xs">
+                <h1 className="text-headline-lg font-bold text-on-surface">
+                    Bienvenido
+                </h1>
+                <p className= "text-body-md text-on-surface-variant">
+                    Ingresá tus credenciales para acceder al panel
+                </p>
+            </div>                                                      
+            <form onSubmit={handleSubmit} className="space-y-md">
                 {error && (
-                    <div className= "rounded-lg bg-red-50 p-3 text-sm text-red-700">
+                    <div className="flex items-center gap-sm rounded-lg bg-error-container px-md-error-container px-md py-sm text-body-md text-on-error-container">
+                        <span className="material-symbols-outlined text-[18px]">error</span>
                         {error}
                     </div>
                 )}
 
-                <div>
-                    <label className="block text-sm font-medium text-zinc-700">
+                <div className="space-y-xs">
+                    <label className="block text-label-lg font-medium text-on-surface-variant">
                         Email
                     </label>
                     <input
                         id="email"
                         type="email"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange= {(e) => setEmail(e.target.value)}
                         required
-                        disabled={isLoading}
-                        className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-zinc-900 placeholder-zinc-400 focus:border-zinc-500 focus:outline-none disabled:bg-zinc-100"
-                        placeholder="Tu email"
-                        />
+                        disabled = {isLoading}
+                        className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-md py-sm text-body-lg text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none disabled:bg-surface-container"
+                        placeholder="tu@email.com"
+                    />
                 </div>
-                <div>
-                    <label className="block text-sm font-medium text-zinc-700">
+
+                <div className="space-y-xs">
+                    <label className="block text-label-lg font-medium text-on-surface-variant">
                         Contraseña
                     </label>
                     <input
                         id="password"
                         type="password"
                         value={password}
-                        onChange={(e)=> setPassword(e.target.value)}
+                        onChange={(e) => setPassword(e.target.value)}
                         required
                         disabled={isLoading}
-                        className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-zinc-900 placeholder-zinc-400 focus:border-zinc-500 focus:outline-none disabled:bg-zinc-100"
-                        placeholder="Tu contraseña"
+                        className="w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-md py-sm text-body-lg text-on-surface placeholder:text-on-surface-variant/50 focus:border-primary focus:outline-none disabled:bg-surface-container"
+                        placeholder="••••••••"
                     />
                 </div>
+
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full rounded-lg bg-zinc-900 px-4 py-2 font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
-                    >
-                        {isLoading ? "Iniciando sesion..." : "Iniciar sesion"}
-                    </button>
+                    className="w-full rounded-lg bg-primary px-md py-sm text-label-lg font-medium text-on-primary hover:bg-primary-container disabled:opacity-50">
+
+                    {isLoading ? (
+                        <span className="flex items-center justify-center gap-sm">
+                            <span className="material-symbols-outlined animate-spin text-[18px]">
+                                progress_activity
+                            </span>
+                                Iniciando sesión...
+                        </span>
+                        ) : (
+                            "Iniciar sesion"
+                        )}
+                </button>
             </form>
         </div>
     )
-
 }

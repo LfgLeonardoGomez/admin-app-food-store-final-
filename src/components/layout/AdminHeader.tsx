@@ -7,37 +7,73 @@ import { useAuthStore } from "../../store/useAuthStore"
  * Se renderiza dentro de AppLayout en todas las paginas protegidas
  */
 
-export function AdminHeader() {
+interface Props {
+    searchPlaceholde?: string
+}
+
+export function AdminHeader({searchPlaceholder = "Buscar ... "}: Props) {
     const user = useAuthStore((s)=>s.user)
     const logout = useAuthStore((s)=> s.logout)
 
     if (!user) return null
 
-    return (
-        <header className= "flex items-center justify-between gap-4 px-6 py-4 border-b border-zinc-200 bg-white">
+    //Mostrar las iniciales de los nombres como logo
+    const initials = `${user.nombre[0]}${user.apellido[0]}`.toUpperCase()
+    //Mostrar el primer rol
+    const rolLabel = user.roles[0]
 
-            {/* Datos del ususario */}
-            <div>
-                <p className="text-sm font-semibold text-zinc-900">
-                    {user.nombre} {user.apellido}
-                </p>
-                <p className= "text-xs text-zinc-500">
-                    {user.email} .{" "}
-                    {user.roles.map((r) => (
-                        <span key={r} className= "font-medium text-violet-600">
-                            {r}{" "}
-                        </span>
-                    ))}
-                </p>
+    return (
+        <header className= "h-16 flex items-center justify-between px-lg border-b border-outline-variant bg-surface sticky top-0 z-30">
+
+            {/* Buscador */}
+            <div className="flex items-center flex-1 max-w-md">
+                <div className="relative w-full">
+                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary text-[20px]">
+                        search
+                    </span>
+                    <input
+                        type="text"
+                        placeholder={searchPlaceholder}
+                        className="w-full bg-surface-container-low border border-outline-variant rounded-full py-2 pl-10 pr-4 text-body-md focus:outline-none focus:border-primary transition-colors"
+                    />
+                </div>
             </div>
 
-            {/* Boton logout */}
-            <button
-                type="button"
-                onClick={logout}
-                className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-50">
-                    Cerrar sesion
+            {/* Derecha */}
+            <div className="flex items-center gap-md">
+
+                {/* Notificaciones */}
+                <button type="button" className="p-2 text-secondary hover:bg-surface-container-low rounded-full transition-colors">
+                    <span className="material-symbols-outlined">notifications</span>
                 </button>
+
+                {/* Divisor */}
+                <div className="h-8 w-px bg-outline-variant" />
+
+                {/* Usuario */}
+                <div className="flex items-center gap-sm">
+                    <div className="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center text-label-sm font-bold">
+                        {initials}
+                    </div>
+                    <div className="hidden lg:block">
+                        <p className="text-label-lg font-semibold text-on-surface">
+                            {user.nombre} {user.apellido}
+                        </p>
+                        <p className="text-label-sm text-secondary">{rolLabel}</p>
+                    </div>
+                </div>
+
+                {/* Logout */}
+                <button
+                    type="button"
+                    onClick={logout}
+                    title="Cerrar sesión"
+                    className="p-2 text-secondary hover:bg-error/10 hover:text-error rounded-full transition-colors"
+                >
+                    <span className="material-symbols-outlined">logout</span>
+                </button>
+
+            </div>
         </header>
     )
 }
