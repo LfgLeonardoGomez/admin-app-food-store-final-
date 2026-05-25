@@ -7,6 +7,7 @@ import { ROUTES } from "./routes"
 import { LoginPage } from "../modules/auth/pages/LoginPage"
 import { CategoriasPage } from "../modules/categorias"
 import { IngredientesPage } from "../modules/ingredientes"
+import { ProductosPage } from "../modules/productos"
 
 /**
  * Definicion completa de rutas de la app
@@ -48,7 +49,7 @@ export const AppRouter = () => {
 
             {/* ADMIN - STOCK */}
             <Route element={<ProtectedRoute allowedRoles={["ADMIN", "STOCK"]} />}>
-              <Route path={ROUTES.PRODUCTOS} element={<div>Productos</div>} />
+              <Route path={ROUTES.PRODUCTOS} element={<ProductosPage/>} />
             </Route>
 
             {/* ADMIN - PEDIDOS */}
