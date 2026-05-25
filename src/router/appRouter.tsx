@@ -1,15 +1,12 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom"
-import { lazy, Suspense } from "react"
 import { AppLayout } from "../components/layout/AppLayout"
 import { AuthLayout } from "../components/layout/AuthLayout"
 import { InitApp } from "../components/InitApp"
 import { ProtectedRoute } from "./ProtectedRoutes"
 import { ROUTES } from "./routes"
 import { LoginPage } from "../modules/auth/pages/LoginPage"
-
-const CategoriasPage = lazy(() =>
-  import("../modules/categorias").then((m) => ({ default: m.CategoriasPage }))
-)
+import { CategoriasPage } from "../modules/categorias"
+import { IngredientesPage } from "../modules/ingredientes"
 
 /**
  * Definicion completa de rutas de la app
@@ -45,15 +42,8 @@ export const AppRouter = () => {
 
             {/* Solo ADMIN */}
             <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
-              <Route
-                path={ROUTES.CATEGORIAS}
-                element={
-                  <Suspense fallback={null}>
-                    <CategoriasPage />
-                  </Suspense>
-                }
-              />
-              <Route path={ROUTES.INGREDIENTES} element={<div>Ingredientes</div>} />
+              <Route path={ROUTES.CATEGORIAS} element= {<CategoriasPage />} />
+              <Route path={ROUTES.INGREDIENTES} element={<IngredientesPage/>} />
             </Route>
 
             {/* ADMIN - STOCK */}
