@@ -1,73 +1,97 @@
-# React + TypeScript + Vite
+# FoodStore — Panel de Administración
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Panel de administración para la gestión de una aplicación de pedidos de comida. Construido con React, TypeScript y Tailwind CSS, consume la API REST del backend FastAPI.
 
-Currently, two official plugins are available:
+## Tecnologías
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **React 19** + **TypeScript**
+- **Vite** — bundler y servidor de desarrollo
+- **Tailwind CSS v4** — estilos
+- **TanStack Query v5** — manejo de estado de servidor
+- **Axios** — cliente HTTP con soporte a cookie HTTPOnly
+- **React Router DOM v7** — navegación y rutas protegidas
+- **Zustand** — estado global de autenticación
 
-## React Compiler
+## Requisitos previos
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Node.js 18 o superior
+- El backend (FastAPI) corriendo en `http://localhost:8000`
 
-## Expanding the ESLint configuration
+## Instalación y configuración
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 1. Clonar el repositorio
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+git clone <url-del-repositorio>
+cd admin-app-food-store-final-
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. Instalar dependencias
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+pnpm install
+```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 3. Configurar variables de entorno
+
+Copiá el archivo de ejemplo y renombralo a `.env`:
+
+```bash
+cp .envExample .env
+```
+
+Abrí `.env` y ajustá la URL si el backend corre en otro puerto:
+
+```env
+VITE_API_BASE_URL=http://localhost:8000
+```
+
+### 4. Levantar el servidor de desarrollo
+
+```bash
+pnpm run dev
+```
+
+La app queda disponible en `http://localhost:5173`.
+
+## Credenciales de prueba
+
+El backend debe tener corrido el seed para que estos usuarios existan:
+
+| Rol | Email | Contraseña |
+|-----|-------|------------|
+| Administrador | admin@foodstore.com | (la del seed) |
+| Gestor de Stock | stock@foodstore.com | (la del seed) |
+| Gestor de Pedidos | pedidos@foodstore.com | (la del seed) |
+
+## Roles y permisos
+
+| Módulo | ADMIN | STOCK | PEDIDOS |
+|--------|-------|-------|---------|
+| Dashboard | ✅ | ✅ | ✅ |
+| Categorías | ✅ | ❌ | ❌ |
+| Ingredientes | ✅ | ❌ | ❌ |
+| Productos (CRUD completo) | ✅ | ❌ | ❌ |
+| Productos (stock y disponibilidad) | ✅ | ✅ | ❌ |
+| Pedidos (ver y cambiar estado) | ✅ | ❌ | ✅ |
+
+## Estructura del proyecto
+
+```
+src/
+├── api/              # Funciones de llamadas a la API (Axios)
+├── components/
+│   └── layout/       # AppLayout, Sidebar, AdminHeader, AuthLayout
+├── hooks/            # useForm, useNotification
+├── modules/          # Módulos por feature
+│   ├── auth/
+│   ├── categorias/
+│   ├── dashboard/
+│   ├── ingredientes/
+│   ├── pedidos/
+│   └── productos/
+├── router/           # AppRouter, ProtectedRoutes, rutas
+├── store/            # useAuthStore (Zustand)
+├── types/            # Interfaces TypeScript por entidad
+└── ui/               # Componentes reutilizables (StatCard, Pagination, etc.)
 ```
