@@ -10,6 +10,7 @@ export interface IIngredienteCreate {
   nombre: string
   descripcion?: string | null
   es_alergeno: boolean
+  disponible: boolean
 }
 
 export interface IIngredienteUpdate {

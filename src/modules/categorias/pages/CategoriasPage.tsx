@@ -38,7 +38,7 @@ export function CategoriasPage() {
     queryFn: () => getCategorias(page * LIMIT, LIMIT),
   })
 
-  const totalPages = Math.ceil((data?.total ?? 0) / LIMIT)
+  const totalPages = Math.ceil((data?.count ?? 0) / LIMIT)
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => deleteCategoria(id),
@@ -125,11 +125,11 @@ export function CategoriasPage() {
                       <td className={`${TD_CLASS} font-medium text-on-surface`}>{cat.nombre}</td>
                       <td className={TD_CLASS}>
                         <StatusBadge
-                          label={cat.parent_id ? "Subcategoría" : "Categoría"}
-                          variant={cat.parent_id ? "secondary" : "primary"}
+                          label={cat.categoria_padre_id ? "Subcategoría" : "Categoría"}
+                          variant={cat.categoria_padre_id ? "secondary" : "primary"}
                         />
                       </td>
-                      <td className={TD_CLASS}>{cat.parent_id ?? "—"}</td>
+                      <td className={TD_CLASS}>{cat.categoria_padre_id ?? "—"}</td>
                       {isAdmin && (
                         <td className={TD_CLASS}>
                           <TableActions
@@ -148,7 +148,7 @@ export function CategoriasPage() {
             <Pagination
               page={page}
               totalPages={totalPages}
-              total={data.total}
+              total={data.count}
               itemLabel="categorías"
               isLoading={isLoading}
               onPrev={() => setPage((p) => Math.max(p - 1, 0))}

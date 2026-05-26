@@ -28,6 +28,11 @@ export interface IProductoUpdate {
     disponible?: boolean
 }
 
+export interface IProductoStockUpdate {
+    stock_cantidad?: number
+    disponible?: boolean
+}
+
 export interface IProductoList {
     data: IProducto []
     count: number

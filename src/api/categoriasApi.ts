@@ -17,7 +17,7 @@ export const createCategoria = async (body: ICategoriaCreate): Promise<ICategori
 }
 
 export const updateCategoria = async (id: number, body: Partial<ICategoriaCreate>): Promise<ICategoria> => {
-  const { data } = await apiClient.patch<ICategoria>(`/categorias/${id}`, body)
+  const { data } = await apiClient.put<ICategoria>(`/categorias/${id}`, body)
   return data
 }
 

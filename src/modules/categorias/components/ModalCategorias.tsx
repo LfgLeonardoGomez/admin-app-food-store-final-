@@ -1,6 +1,6 @@
 import { useEffect } from "react"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { createCategoria, updateCategoria } from "../../../api/categoriasApi"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { createCategoria, updateCategoria, getCategorias } from "../../../api/categoriasApi"
 import { useForm } from "../../../hooks/useForm"
 import { useNotification } from "../../../hooks/useNotification"
 import { Notification } from "../../../ui/Notification"
@@ -17,13 +17,13 @@ interface ModalCategoriasProps {
 type CategoriaForm = {
   nombre: string
   descripcion: string
-  parent_id: string
+  categoria_padre_id: string
 }
 
 const EMPTY_FORM: CategoriaForm = {
   nombre: "",
   descripcion: "",
-  parent_id: "",
+  categoria_padre_id: "",
 }
 
 /**
@@ -36,12 +36,22 @@ export function ModalCategorias({ isOpen, onClose, categoriaToEdit }: ModalCateg
   const { mensajeExito, mensajeError, mostrarExito, mostrarError } = useNotification()
   const { formState, handleChange, setFormState } = useForm<CategoriaForm>(EMPTY_FORM)
 
+  const { data: categoriasData } = useQuery({
+    queryKey: ["categorias"],
+    queryFn: ()=> getCategorias(0,100)
+  })
+
+  // Solo categorías raíz (sin padre) pueden ser padre de otra
+  const categoriasRaiz = (categoriasData?.data ?? []).filter(
+    (c) => !c.categoria_padre_id && c.id !== categoriaToEdit?.id
+  )
+
   useEffect(() => {
     if (categoriaToEdit) {
       setFormState({
         nombre: categoriaToEdit.nombre,
         descripcion: categoriaToEdit.descripcion ?? "",
-        parent_id: categoriaToEdit.parent_id?.toString() ?? "",
+        categoria_padre_id: categoriaToEdit.categoria_padre_id?.toString() ?? "",
       })
     } else {
       setFormState(EMPTY_FORM)
@@ -52,7 +62,7 @@ export function ModalCategorias({ isOpen, onClose, categoriaToEdit }: ModalCateg
   const buildPayload = (): ICategoriaCreate => ({
     nombre: formState.nombre,
     descripcion: formState.descripcion || null,
-    parent_id: formState.parent_id ? Number(formState.parent_id) : null,
+    categoria_padre_id: formState.categoria_padre_id ? Number(formState.categoria_padre_id) : null,
   })
 
   const createMutation = useMutation({
@@ -139,17 +149,22 @@ export function ModalCategorias({ isOpen, onClose, categoriaToEdit }: ModalCateg
           <div>
             <label className="block text-label-lg text-on-surface-variant">
               Categoría padre{" "}
-              <span className="text-secondary font-normal">(opcional — ID numérico)</span>
+              <span className="text-secondary font-normal">(opcional)</span>
             </label>
-            <input
-              type="number"
-              name="parent_id"
-              value={formState.parent_id}
+            <select
+              name="categoria_padre_id"
+              value={formState.categoria_padre_id}
               onChange={handleChange}
               disabled={isPending}
-              placeholder="Dejar vacío si es categoría raíz"
               className={INPUT_MT}
-            />
+            >
+              <option value=""> - Categoria raiz - </option>
+              {categoriasRaiz.map((c) => (
+                <option key= {c.id} value={c.id}>
+                  {c.nombre}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="flex justify-end gap-3 pt-2">

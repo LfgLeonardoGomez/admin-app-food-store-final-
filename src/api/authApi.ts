@@ -1,7 +1,7 @@
 import apiClient from "./axiosInstance";
 import type { AuthUser } from "../types/auth";
 
-const AUTH = "/auth";
+const AUTH = "/api/v1";
 
 
 /**
@@ -23,7 +23,7 @@ export async function requestLogin (
     password: string
 ): Promise<void> {
     const body = new URLSearchParams({ username: email, password });
-    await apiClient.post(`${AUTH}/token`, body, {
+    await apiClient.post(`${AUTH}/login`, body, {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
     });
 }

@@ -7,7 +7,8 @@ export const useForm = <T extends Object>(initialState: T) => {
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) => {
     const inputName = e.target.name;
-    const inputValue = e.target.value;
+    const isCheckbox = e.target instanceof HTMLInputElement && e.target.type === "checkbox";
+    const inputValue = isCheckbox ? (e.target as HTMLInputElement).checked : e.target.value;
     setFormState((prev) => ({
       ...prev,
       [`${inputName}`]: inputValue,

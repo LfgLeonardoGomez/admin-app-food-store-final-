@@ -1,4 +1,4 @@
-import type { IProducto, IProductoCreate, IProductoList, IProductoUpdate } from "../types/IProducto"
+import type { IProducto, IProductoCreate, IProductoList, IProductoUpdate, IProductoStockUpdate } from "../types/IProducto"
 import { apiClient } from "./axiosInstance"
 
 export const getProductos = async (offset= 0, limit= 20):Promise <IProductoList> => {
@@ -23,4 +23,9 @@ export const updateProducto = async (id:number, body: IProductoUpdate): Promise 
 
 export const deleteProducto = async (id: number): Promise <void> => {
     await apiClient.delete (`/productos/${id}`)
+}
+
+export const updateProductoStock = async (id: number, body: IProductoStockUpdate): Promise<IProducto> => {
+    const { data } = await apiClient.patch<IProducto>(`/productos/${id}/stock`, body)
+    return data
 }

@@ -8,6 +8,8 @@ import { LoginPage } from "../modules/auth/pages/LoginPage"
 import { CategoriasPage } from "../modules/categorias"
 import { IngredientesPage } from "../modules/ingredientes"
 import { ProductosPage } from "../modules/productos"
+import { PedidosPage } from "../modules/pedidos"
+import { DashboardPage } from "../modules/dashboard"
 
 /**
  * Definicion completa de rutas de la app
@@ -38,7 +40,7 @@ export const AppRouter = () => {
 
             {/* ADMIN - STOCK - PEDIDOS */}
             <Route element={<ProtectedRoute allowedRoles={["ADMIN", "STOCK", "PEDIDOS"]} />}>
-              <Route path={ROUTES.DASHBOARD} element={<div>Dashboard</div>} />
+              <Route path={ROUTES.DASHBOARD} element={<DashboardPage/>} />
             </Route>
 
             {/* Solo ADMIN */}
@@ -54,7 +56,7 @@ export const AppRouter = () => {
 
             {/* ADMIN - PEDIDOS */}
             <Route element={<ProtectedRoute allowedRoles={["ADMIN", "PEDIDOS"]} />}>
-              <Route path={ROUTES.PEDIDOS} element={<div>Pedidos</div>} />
+              <Route path={ROUTES.PEDIDOS} element={<PedidosPage />} />
             </Route>
 
           </Route>

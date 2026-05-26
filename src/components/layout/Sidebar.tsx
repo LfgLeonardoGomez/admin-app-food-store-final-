@@ -28,6 +28,7 @@ const NAV_ITEMS: NavItem[] = [
 
 export function Sidebar(){
     const hasRole = useAuthStore((s) => s.hasRole)
+    const isLoading = useAuthStore((s) => s.isLoading)
 
     const itemsVisibles= NAV_ITEMS.filter((item)=>
         item.roles.some((r)=> hasRole(r as any))
@@ -49,22 +50,33 @@ export function Sidebar(){
 
             {/* Link de navegacion */}
             <nav className="flex flex-col gap-xs flex-1">
-                {itemsVisibles.map((item) => (
-                    <NavLink
-                        key={item.to}
-                        to={item.to}
-                        className={({ isActive }) =>
-                        `flex items-center gap-md p-md rounded-lg transition-all text-label-lg ${
-                            isActive
-                                ? "bg-secondary-container text-on-secondary-container font-bold"
-                                : "text-secondary hover:bg-surface-container-low font-semibold"
-                            }`
-                        }
-                    >
-                        <span className= "material-symbols-outlined">{item.icon}</span>
-                        <span>{item.label}</span>
-                    </NavLink>
-                ))}
+                {isLoading ? (
+                    <>
+                        {[1, 2, 3]. map((i) => (
+                            <div
+                                key={i}
+                                className="h-10 rounded-lg bg-surface-container-low animate-pulse"
+                            />
+                        ))}
+                    </>
+                ) : (
+                     itemsVisibles.map((item) => (
+                        <NavLink
+                            key={item.to}
+                            to={item.to}
+                            className={({ isActive }) =>
+                            `flex items-center gap-md p-md rounded-lg transition-all text-label-lg ${
+                                isActive
+                                    ? "bg-secondary-container text-on-secondary-container font-bold"
+                                    : "text-secondary hover:bg-surface-container-low font-semibold"
+                                }`
+                            }
+                        >
+                            <span className= "material-symbols-outlined">{item.icon}</span>
+                            <span>{item.label}</span>
+                        </NavLink>
+                     ))
+                )}
             </nav>
         </aside>
     )

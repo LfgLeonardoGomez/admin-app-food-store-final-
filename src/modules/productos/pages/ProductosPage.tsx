@@ -23,12 +23,14 @@ export function ProductosPage () {
     const queryCliente = useQueryClient()
     const { mensajeExito, mensajeError, mostrarExito, mostrarError } = useNotification ()
     const isAdmin = useAuthStore ((s)=> s.hasRole("ADMIN"))
+    const isStock = useAuthStore ((s) => s.hasRole("STOCK"))
 
     const [page, setPage] = useState(0)
     const LIMIT = 5
 
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [ productoToEdit, setProductoToEdit ] = useState <IProducto | undefined> (undefined)
+    const [ stockOnly, setStockOnly ] = useState(false)
 
     const [isDeleteOpen, setIsDeleteOpen ] = useState(false)
     const [idToDelete, setIdToDelete ] = useState <number | null >(null)
@@ -54,14 +56,16 @@ export function ProductosPage () {
         }
     })
 
-    const handleOpenModal = (producto?: IProducto) => {
+    const handleOpenModal = (producto?: IProducto , soloStock = false) => {
         setProductoToEdit (producto)
+        setStockOnly (soloStock)
         setIsModalOpen(true)
     }
 
     const handleCloseModal = () => {
         setIsModalOpen (false)
         setProductoToEdit (undefined)
+        setStockOnly(false)
     }
 
     const handleDelete = (id: number) => {
@@ -111,7 +115,7 @@ export function ProductosPage () {
                                         <th className= {TH_CLASS}> Stock</th>
                                         <th className= {TH_CLASS}> Categoria</th>
                                         <th className= {TH_CLASS}> Disponible</th>
-                                        {isAdmin && <th className={`${TH_CLASS} text-right`}>Acciones</th>}
+                                        {(isAdmin || isStock) && <th className={`${TH_CLASS} text-right`}>Acciones</th>}
                                     </tr>
                                 </thead>
 
@@ -121,8 +125,19 @@ export function ProductosPage () {
                                             <td className= {TD_CLASS}> #{prod.id}</td>
                                             <td className= {TD_CLASS}>
                                                 <div className= "flex items-center gap-2">
-                                                    <div className= "w-7 h-7 rounded bg-surface-variant flex items-center justify-center shrink-0">
-                                                        <span className= "material-symbols-outlined text-secondary text-[16px] overflow-hidden" >local_pizza </span>
+                                                    <div className="w-7 h-7 rounded bg-surface-variant flex items-center justify-center shrink-0 overflow-hidden">
+                                                        {prod.imagen_url ? (
+                                                        <img
+                                                            src={prod.imagen_url}
+                                                            alt={prod.nombre}
+                                                            className="w-full h-full object-cover"
+                                                            onError={(e) => { e.currentTarget.style.display = "none" }}
+                                                         />
+                                                        ) : (
+                                                        <span className="material-symbols-outlined text-secondary text-[16px] overflow-hidden">
+                                                            local_pizza
+                                                        </span>
+                                                         )}
                                                     </div>
                                                     <span className= "font-medium text-on-surface">{prod.nombre}</span>
                                                 </div>
@@ -147,11 +162,11 @@ export function ProductosPage () {
                                                 />
                                             </td>
 
-                                            {isAdmin && (
+                                            {(isAdmin || isStock) && (
                                                 <td className= {TD_CLASS}>
                                                     <TableActions
-                                                        onEdit= {() => handleOpenModal (prod)}
-                                                        onDelete={()=> handleDelete (prod.id)}
+                                                        onEdit= {() => handleOpenModal (prod, !isAdmin)}
+                                                        onDelete={isAdmin ? () => handleDelete (prod.id) : undefined}
                                                         disabled={deleteMutation.isPending}
                                                     />
                                                 </td>
@@ -187,6 +202,7 @@ export function ProductosPage () {
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
                 productoToEdit={productoToEdit}
+                stockOnly= {stockOnly}
             />
 
             <ConfirmDeleteModal

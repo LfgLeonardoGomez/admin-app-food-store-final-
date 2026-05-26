@@ -17,12 +17,14 @@ type IngredienteForm = {
   nombre: string
   descripcion: string
   es_alergeno: boolean
+  disponible: boolean
 }
 
 const EMPTY_FORM: IngredienteForm = {
   nombre: "",
   descripcion: "",
   es_alergeno: false,
+  disponible: true,
 }
 
 export function ModalIngredientes({ isOpen, onClose, ingredienteToEdit }: ModalIngredientesProps) {
@@ -36,6 +38,7 @@ export function ModalIngredientes({ isOpen, onClose, ingredienteToEdit }: ModalI
         nombre: ingredienteToEdit.nombre,
         descripcion: ingredienteToEdit.descripcion ?? "",
         es_alergeno: ingredienteToEdit.es_alergeno,
+        disponible: ingredienteToEdit.disponible,
       })
     } else {
       setFormState(EMPTY_FORM)
@@ -46,6 +49,7 @@ export function ModalIngredientes({ isOpen, onClose, ingredienteToEdit }: ModalI
     nombre: formState.nombre,
     descripcion: formState.descripcion || null,
     es_alergeno: formState.es_alergeno,
+    disponible: formState.disponible,
   })
 
   const createMutation = useMutation({
@@ -98,7 +102,6 @@ export function ModalIngredientes({ isOpen, onClose, ingredienteToEdit }: ModalI
             <span className="material-symbols-outlined text-[20px] overflow-hidden">close</span>
           </button>
         </div>
-
         {/* Formulario */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
 
@@ -143,6 +146,23 @@ export function ModalIngredientes({ isOpen, onClose, ingredienteToEdit }: ModalI
               Es alérgeno
             </label>
           </div>
+
+            {ingredienteToEdit && (
+          <div className="flex items-center gap-3 pt-1">
+            <input
+              type="checkbox"
+              id="disponible"
+              name="disponible"
+              checked={formState.disponible}
+              onChange={handleChange}
+              disabled={isPending}
+              className="w-4 h-4 accent-primary"
+            />
+            <label htmlFor="disponible" className="text-label-lg text-on-surface-variant cursor-pointer">
+              Disponible
+             </label>
+           </div>
+          )}
 
           <div className="flex justify-end gap-3 pt-2">
             <button
