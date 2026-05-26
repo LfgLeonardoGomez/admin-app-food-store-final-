@@ -95,3 +95,9 @@ src/
 ├── types/            # Interfaces TypeScript por entidad
 └── ui/               # Componentes reutilizables (StatCard, Pagination, etc.)
 ```
+
+## Video de presentación
+
+Link al video explicativo del proyecto:
+
+https://youtu.be/4odNGl1uBh0
