@@ -17,6 +17,7 @@ export interface IIngredienteUpdate {
   nombre?: string
   descripcion?: string | null
   es_alergeno?: boolean
+  disponible?: boolean
 }
 
 export interface IIngredienteList {

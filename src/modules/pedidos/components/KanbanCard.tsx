@@ -37,7 +37,7 @@ export function KanbanCard({ pedido, isExpanded, onClick, onAvanzar, isLoading }
         return (
             <article
                 onClick={onClick}
-                className="bg-surface-container-lowest p-4 rounded-lg border border-outline-variant hover:shadow-md hover:border-primary/40 trasition-all cursor-pointer">
+                className="bg-surface-container-lowest p-4 rounded-lg border border-outline-variant hover:shadow-md hover:border-primary/40 transition-all cursor-pointer">
                 <p className = "text-label-lg text-secondary mb-1">#{pedido.id}</p>
                 <p className = "text-body-md font-medium text-on-surface">Usuario #{pedido.usuario_id}</p>
                 <p className = "text-label-md text-secondary mt-1">${pedido.total}</p>
@@ -72,7 +72,7 @@ export function KanbanCard({ pedido, isExpanded, onClick, onAvanzar, isLoading }
                         <p className= "text-body-md font-medium">Usuario #{pedido.usuario_id}</p>
                     </div>
                     <div>
-                        <p className= "text-labe-md text-secondary uppercase tracking-wider mb-1">Pago</p>
+                        <p className= "text-label-md text-secondary uppercase tracking-wider mb-1">Pago</p>
                         <p className= "text-body-md">{pedido.forma_pago_codigo}</p>
                     </div>
                     <div>
@@ -84,7 +84,7 @@ export function KanbanCard({ pedido, isExpanded, onClick, onAvanzar, isLoading }
                 {pedido.notas && (
                     <div>
                         <p className= "text-label-md text-secondary uppercase tracking-wider mb-1">Notas</p>
-                        <div className= "bg-surface-container-low p-3 rounded-lg border border-outline-variant italic text-body-md text-onsurface-variant">"{pedido.notas}</div>
+                        <div className= "bg-surface-container-low p-3 rounded-lg border border-outline-variant italic text-body-md text-on-surface-variant">"{pedido.notas}</div>
                     </div>
                 )}
             </div>
@@ -95,7 +95,7 @@ export function KanbanCard({ pedido, isExpanded, onClick, onAvanzar, isLoading }
                     <button
                         onClick= {onAvanzar}
                         disabled={isLoading}
-                        className= "w-full bg-primary-container text-on-primary-container py-3 rounded-xl text-label-lg font-semibold flex items-center justify-center gap-2 hover-brightness-110 active-scale-[0.98] transition-all disabled:opacity-50">
+                        className= "w-full bg-primary-container text-on-primary-container py-3 rounded-xl text-label-lg font-semibold flex items-center justify-center gap-2 hover-brightness-110 active:scale-[0.98] transition-all disabled:opacity-50">
 
                         {isLoading ? (
                             <span className= "material-symbols-outlined animate-spin text-[18px] overflow-hidden">progress_activity</span>

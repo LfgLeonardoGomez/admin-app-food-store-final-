@@ -20,7 +20,7 @@ function stockVariant (stock: number): "success" | "warning" | "error" {
 }
 
 export function ProductosPage () {
-    const queryCliente = useQueryClient()
+    const queryClient = useQueryClient()
     const { mensajeExito, mensajeError, mostrarExito, mostrarError } = useNotification ()
     const isAdmin = useAuthStore ((s)=> s.hasRole("ADMIN"))
     const isStock = useAuthStore ((s) => s.hasRole("STOCK"))
@@ -45,7 +45,7 @@ export function ProductosPage () {
     const deleteMutation = useMutation ({
         mutationFn: (id:number) => deleteProducto (id),
         onSuccess: ()=>{
-            queryCliente.invalidateQueries({ queryKey: ["productos"] })
+            queryClient.invalidateQueries({ queryKey: ["productos"] })
             mostrarExito("Producto eliminado correctamente")
             setIsDeleteOpen(false)
             setIdToDelete(null)
