@@ -121,7 +121,7 @@ export function ProductosPage () {
 
                                 <tbody className= "divide-y divide-outline-variant">
                                     {data.data.map((prod) => (
-                                        <tr key={prod.id} className= "hover:bg-surface-contariner-low transition-colors">
+                                        <tr key={prod.id} className= "hover:bg-surface-container-low transition-colors">
                                             <td className= {TD_CLASS}> #{prod.id}</td>
                                             <td className= {TD_CLASS}>
                                                 <div className= "flex items-center gap-2">

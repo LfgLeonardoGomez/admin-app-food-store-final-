@@ -8,7 +8,7 @@ import { useAuthStore } from "../../store/useAuthStore"
  */
 
 interface Props {
-    searchPlaceholde?: string
+    searchPlaceholder?: string
 }
 
 export function AdminHeader({searchPlaceholder = "Buscar ... "}: Props) {
