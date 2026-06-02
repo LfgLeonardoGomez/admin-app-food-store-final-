@@ -1,6 +1,8 @@
 import type { IPedido, EstadoPedido } from "../../../types/IPedido"
 import { ESTADO_LABELS} from "../../../types/IPedido"
 import { StatusBadge } from "../../../ui/StatusBadge"
+import { useQuery } from "@tanstack/react-query"
+import { getDetallesPedido } from "../../../api/pedidosApi"
 
 const ESTADO_VARIANT: Record<EstadoPedido, "primary" | "secondary" | "success" | "warning" | "error" > = {
     PENDIENTE: "warning",
@@ -32,6 +34,12 @@ interface KanbanCardProps {
 export function KanbanCard({ pedido, isExpanded, onClick, onAvanzar, isLoading }: KanbanCardProps) {
     const botonLabel = BOTON_LABEL [pedido.estado_codigo]
     const esTerminal = pedido.estado_codigo === "ENTREGADO" || pedido.estado_codigo === "CANCELADO"
+
+    const { data: detalles, isLoading: isLoadingDetalles, isError: isErrorDetalles } = useQuery ({
+        queryKey: ["detallesPedido", pedido.id],
+        queryFn: () => getDetallesPedido (pedido.id),
+        enabled: isExpanded
+    })
 
     if (!isExpanded) {
         return (
@@ -87,6 +95,40 @@ export function KanbanCard({ pedido, isExpanded, onClick, onAvanzar, isLoading }
                         <div className= "bg-surface-container-low p-3 rounded-lg border border-outline-variant italic text-body-md text-on-surface-variant">"{pedido.notas}</div>
                     </div>
                 )}
+
+                {/* Items del pedido */}
+                <div>
+                    <p className = "text-label-md text-secondary uppercase tracking-wider mb-2"> Items del pedido</p>
+
+                    {isLoadingDetalles && (
+                        <div className= "flex items-center gap-2 text-body-md text-on-surface-variant py-2">
+                            <span className = "material-symbols-outlined animate-spin text-[16px] overflow-hidden">progress_activity</span>
+                            Cargando items ...
+                        </div>
+                    )}
+
+                    {isErrorDetalles && (
+                        <p className = "text-body-md text-error py-2"> No se pudieron cargar los items.</p>
+                    )}
+
+                    {detalles && detalles.data.length === 0 && (
+                        <p className= "text-body-md text-on-surface-variant py-2 italic"> Sin items registrados</p>
+                    )}
+
+                    {detalles && detalles.data.length > 0 && (
+                        <ul className= "flex flex-col gap-2">
+                            {detalles.data.map((item, index) => (
+                                <li key={index} className= "bg-surface-container-low rounded-lg border border-outline-variant px-3 py-2 flex justify-between items-start">
+                                    <div>
+                                        <p className= "text-body-md font-medium text-on-surface">{item.nombre_snapshot}</p>
+                                        <p className= "text-label-md text-secondary">x{item.cantidad} . ${item.precio_snapshot}</p>
+                                    </div>
+                                    <p className = "text-body-md font-semibold text-on-surface">${item.subtotal_snapshot}</p>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
             </div>
 
             {/* Boton avanzar */}
