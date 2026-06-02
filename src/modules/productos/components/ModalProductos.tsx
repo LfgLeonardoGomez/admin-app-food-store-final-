@@ -1,6 +1,7 @@
-import { useEffect } from "react"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { createProducto, updateProducto, updateProductoStock } from "../../../api/productosApi"
+import { useEffect, useState } from "react"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { createProducto, updateProducto, updateProductoStock, updateProductoCategorias} from "../../../api/productosApi"
+import { getCategorias } from "../../../api/categoriasApi"
 import { useForm } from "../../../hooks/useForm"
 import { useNotification } from "../../../hooks/useNotification"
 import { Notification } from "../../../ui/Notification"
@@ -37,6 +38,14 @@ export function ModalProductos({ isOpen, onClose, productoToEdit, stockOnly = fa
     const { mensajeExito , mensajeError, mostrarExito, mostrarError } = useNotification ()
     const { formState, handleChange, setFormState } = useForm <ProductoForm> (EMPTY_FORM)
 
+    const [selectedCategorias, setSelectedCategorias] = useState<number []>([])
+
+    const { data: categoriasData } = useQuery({
+        queryKey: ["categorias-all"],
+        queryFn: () => getCategorias(0, 100),
+        enabled: isOpen && !stockOnly,
+    })
+
     useEffect(() => {
         if (productoToEdit) {
             setFormState({
@@ -47,10 +56,18 @@ export function ModalProductos({ isOpen, onClose, productoToEdit, stockOnly = fa
                 stock_cantidad: productoToEdit.stock_cantidad.toString(),
                 disponible: productoToEdit.disponible,
             })
+
+            setSelectedCategorias( productoToEdit.categorias.map((c) => c.id))
         } else {
             setFormState(EMPTY_FORM)
+            setSelectedCategorias([])
         }
     } ,[productoToEdit, isOpen, setFormState])
+
+    const toggleCategoria = (id: number) => {
+        setSelectedCategorias((prev) => prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
+        )
+    }
 
     const buildPayload = (): IProductoCreate => ({
         nombre: formState.nombre,
@@ -62,7 +79,11 @@ export function ModalProductos({ isOpen, onClose, productoToEdit, stockOnly = fa
     })
 
     const createMutation = useMutation({
-    mutationFn: (data: IProductoCreate) => createProducto(data),
+    mutationFn: async (data: IProductoCreate) => {
+        const producto = await createProducto(data)
+        await updateProductoCategorias(producto.id, selectedCategorias)
+        return producto
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["productos"] })
       mostrarExito("Producto creado correctamente")
@@ -72,7 +93,10 @@ export function ModalProductos({ isOpen, onClose, productoToEdit, stockOnly = fa
   })
 
   const updateMutation = useMutation({
-        mutationFn: (data: IProductoCreate) => updateProducto(productoToEdit!.id, data),
+        mutationFn: async (data: IProductoCreate) => {
+            await updateProducto (productoToEdit!.id, data)
+            await updateProductoCategorias(productoToEdit!.id, selectedCategorias)
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["productos"] })
             mostrarExito("Producto actualizado correctamente")
@@ -181,6 +205,30 @@ export function ModalProductos({ isOpen, onClose, productoToEdit, stockOnly = fa
                                     placeholder="https://... (opcional)"
                                     className={INPUT_MT}
                                 />
+                            </div>
+
+                            <div>
+                                <label className = "block text-label-lg text-on-surface-variant mb-1"> Categorias</label>
+                                {categoriasData && categoriasData.data.length > 0 ? (
+                                    <div className = "max-h-32 overflow-y-auto bordeer border-outline-variant rounded-lg p-3 space-y-2">
+                                        {categoriasData.data.map((cat) => (
+                                            <label 
+                                                key= {cat.id}
+                                                className= "lfex itemes-center gap-2 cursor-pointer">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked= {selectedCategorias.includes(cat.id)}
+                                                        onChange= {() => toggleCategoria(cat.id)}
+                                                            disabled={isPending}
+                                                            className= "w-4 h-4 accent-primary"
+                                                    />
+                                                    <span className = "text-body-md text-on-surface">{cat.nombre}</span>
+                                            </label> 
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className = "text-body-sm text-secondary italic mt-1"> No hay categorias disponibles</p>
+                                )}
                             </div>
                         </>
                     )}

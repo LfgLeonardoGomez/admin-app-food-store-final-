@@ -29,3 +29,7 @@ export const updateProductoStock = async (id: number, body: IProductoStockUpdate
     const { data } = await apiClient.patch<IProducto>(`/productos/${id}/stock`, body)
     return data
 }
+
+export const updateProductoCategorias = async (id:number, categorias: number[]): Promise <void> => {
+    await apiClient.put(`/productos/${id}/categorias`, {categorias})
+}
