@@ -13,7 +13,7 @@ const ESTADOS_ORDENADOS: EstadoPedido[] = [
     "PENDIENTE",
     "CONFIRMADO",
     "EN_PREP",
-    "EN_CAMINO",
+    "LISTO",
     "ENTREGADO",
     "CANCELADO",
 ]

@@ -10,7 +10,7 @@ const ESTADO_VARIANT: Record<EstadoPedido, "primary" | "secondary" | "success" |
     PENDIENTE: "warning",
     CONFIRMADO: "primary",
     EN_PREP: "primary",
-    EN_CAMINO: "secondary",
+    LISTO: "secondary",
     ENTREGADO: "success",
     CANCELADO: "error",
 }
@@ -20,7 +20,7 @@ const BOTON_LABEL: Partial <Record<string, string>> = {
     PENDIENTE: "Confirmar pedido",
     CONFIRMADO: "Pasar a preparacion",
     EN_PREP: "Marcar como Listo",
-    EN_CAMINO: "Marcar como Entregado",
+    LISTO: "Marcar como Entregado",
 }
 
 // Si isExpanded es true muestra el detalle completo. sino la vista colapsada
@@ -67,7 +67,7 @@ export function KanbanCard({ pedido, isExpanded, onClick, onAvanzar, onCancelar,
     }
 
     return (
-        <article className = "bg-surface-container-lowest rounded-xl border-2 border-primary overflow-hidden shadow-md flex-shrink-0">
+        <article className = "bg-surface-container-lowest rounded-xl border-2 border-primary overflow-hidden shadow-md shrink-0">
 
             {/* Header */}
             <div className= "px-4 py-3 border-b border-outline-variant bg-surface-container-low flex justify-between items-center">

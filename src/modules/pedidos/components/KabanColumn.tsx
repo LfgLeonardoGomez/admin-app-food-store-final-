@@ -8,7 +8,7 @@ const COLUMN_ACCENT: Record <EstadoPedido, string> = {
     PENDIENTE:  "border-t-warning",
     CONFIRMADO: "border-t-primary",
     EN_PREP:    "border-t-primary",
-    EN_CAMINO:  "border-t-secondary",
+    LISTO:      "border-t-secondary",
     ENTREGADO:  "border-t-success",
     CANCELADO:  "border-t-error",
 }

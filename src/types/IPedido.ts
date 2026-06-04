@@ -2,7 +2,7 @@ export type EstadoPedido =
   | "PENDIENTE"
   | "CONFIRMADO"
   | "EN_PREP"
-  | "EN_CAMINO"
+  | "LISTO"
   | "ENTREGADO"
   | "CANCELADO"
 
@@ -13,7 +13,7 @@ export const ESTADO_LABELS: Record<EstadoPedido, string> = {
   PENDIENTE:  "Pendiente",
   CONFIRMADO: "Confirmado",
   EN_PREP:    "En preparación",
-  EN_CAMINO:  "En camino",
+  LISTO:      "Listo",
   ENTREGADO:  "Entregado",
   CANCELADO:  "Cancelado",
 }
@@ -23,8 +23,8 @@ export const ESTADO_LABELS: Record<EstadoPedido, string> = {
 export const TRANSICIONES_VALIDAS: Record<EstadoPedido, EstadoPedido[]> = {
   PENDIENTE:  ["CONFIRMADO", "CANCELADO"],
   CONFIRMADO: ["EN_PREP",    "CANCELADO"],
-  EN_PREP:    ["EN_CAMINO",  "CANCELADO"],
-  EN_CAMINO:  ["ENTREGADO"],
+  EN_PREP:    ["LISTO",      "CANCELADO"],
+  LISTO:      ["ENTREGADO"],
   ENTREGADO:  [],
   CANCELADO:  [],
 }
