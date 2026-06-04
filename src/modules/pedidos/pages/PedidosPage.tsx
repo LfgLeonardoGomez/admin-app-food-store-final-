@@ -30,6 +30,8 @@ export function PedidosPage() {
     const [ expandedId, setExpandedId ] = useState <number | null> (null)
     const [ loadingId, setLoadingId ] = useState <number | null> (null)
 
+    const [ cancelConfirmId, setCancelConfirmId] = useState <number | null > (null)
+
     const { data, isLoading, isError } = useQuery ({
         queryKey: ["pedidos"],
         queryFn: getPedidos,
@@ -59,6 +61,31 @@ export function PedidosPage() {
         if (siguientes.length === 0 ) return
         setLoadingId(pedido.id)
         avanzarMutation.mutate ({ pedidoId: pedido.id, estadoHacia: siguientes [0] })
+    }
+
+    const cancelarMutation = useMutation ({
+        mutationFn: ({ pedidoId, motivo }: {pedidoId: number; motivo: string}) =>
+            cambiarEstadoPedido(pedidoId, { estado_hacia: "CANCELADO", motivo}),
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ["pedidos"] })
+            mostrarExito("Pedido cancelado")
+            setLoadingId(null)
+            setCancelConfirmId(null)
+        },
+        onError: () => {
+            mostrarError("Error al cancelar el pedido")
+            setLoadingId(null)
+            setCancelConfirmId(null)
+        }
+    })
+
+    const handleCancelar = (pedido: IPedido, motivo: string) => {
+        if (cancelConfirmId !== pedido.id) {
+            setCancelConfirmId (pedido.id)
+            return
+        }
+        setLoadingId(pedido.id)
+        cancelarMutation.mutate({pedidoId: pedido.id, motivo})
     }
 
     // Toggle para que cuando se haga click en una expandida se colapse y si se hace click en otra se expande
@@ -108,8 +135,11 @@ export function PedidosPage() {
                             pedidos= {pedidosPorEstado [estado]}
                             expandedId = {expandedId}
                             loadingId = {loadingId}
+                            cancelConfirmId = {cancelConfirmId}
                             onExpand = {handleExpand}
                             onAvanzar = {handleAvanzar}
+                            onCancelar={handleCancelar}
+                            onCancelConfirmReset = {() => setCancelConfirmId(null)}
                         />
                     ))}
                 </div>

@@ -52,7 +52,7 @@ export interface ICambioEstadoPayload {
   motivo?: string | null
 }
 
- export interface IDetallePedido {
+export interface IDetallePedido {
   producto_id: number
   cantidad: number
   nombre_snapshot: string
@@ -61,7 +61,17 @@ export interface ICambioEstadoPayload {
   personalizacion: number [][]
  }
 
- export interface IDetallePedidoList {
+export interface IDetallePedidoList {
   data: IDetallePedido []
   count: number
  }
+
+export interface IHistorialEstado {
+  id: number
+  pedido_id: number
+  estado_desde: string | null
+  estado_hacia: string
+  usuario_id: number
+  motivo: string | null
+  created_at: string
+}

@@ -19,12 +19,15 @@ interface KanbanColumnProps {
     pedidos: IPedido []
     expandedId: number | null
     loadingId: number | null
+    cancelConfirmId: number | null
     onExpand: (id: number) => void  //callback que disparan acciones en la pagina padre
     onAvanzar: (pedido: IPedido) => void
+    onCancelar: (pedido: IPedido, motivo: string) => void
+    onCancelConfirmReset: () => void
 }
 
 // Recibe los pedidos ya filtrados y delega el estado a la PedidosPage
-export function KanbanColumn ({ estado, pedidos, expandedId, loadingId, onExpand, onAvanzar}: KanbanColumnProps){
+export function KanbanColumn ({ estado, pedidos, expandedId, loadingId, cancelConfirmId, onExpand, onAvanzar, onCancelar, onCancelConfirmReset}: KanbanColumnProps){
     return (
         <div className={`flex flex-col w-72 shrink-0 bg-surface-container-low rounded-xl border-t-4 ${COLUMN_ACCENT[estado]} border border-outline-variant`}>
 
@@ -46,6 +49,9 @@ export function KanbanColumn ({ estado, pedidos, expandedId, loadingId, onExpand
                             isExpanded= {expandedId === pedido.id}
                             onClick= {()=> onExpand(pedido.id)}
                             onAvanzar = {() => onAvanzar(pedido)}
+                            onCancelar = {(motivo)=> onCancelar(pedido, motivo)}
+                            onCancelConfirmReset = {onCancelConfirmReset}
+                            isCancelConfirm = {cancelConfirmId === pedido.id}
                             isLoading= {loadingId === pedido.id}
                         />
                     ))

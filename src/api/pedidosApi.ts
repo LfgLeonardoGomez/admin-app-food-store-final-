@@ -1,4 +1,4 @@
-import type { IPedidoList, IPedido, ICambioEstadoPayload, IDetallePedidoList } from "../types/IPedido"
+import type { IPedidoList, IPedido, ICambioEstadoPayload, IDetallePedidoList, IHistorialEstado } from "../types/IPedido"
 import { apiClient } from "./axiosInstance"
 
 export const getPedidos = async (): Promise<IPedidoList> => {
@@ -23,5 +23,10 @@ export const cambiarEstadoPedido = async ( pedidoId: number, payload: ICambioEst
 
 export const getDetallesPedido = async (pedidoId: number): Promise <IDetallePedidoList> => {
   const {data} = await apiClient.get<IDetallePedidoList>(`/api/v1/detallepedido/pedido/${pedidoId}`)
+  return data
+}
+
+export const getHistorialPedido = async (pedidoId: number): Promise <IHistorialEstado []> => {
+  const {data} = await apiClient.get<IHistorialEstado[]>(`/historialpedidos/${pedidoId}/historial`)
   return data
 }

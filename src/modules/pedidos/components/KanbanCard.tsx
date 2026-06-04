@@ -1,8 +1,10 @@
-import type { IPedido, EstadoPedido } from "../../../types/IPedido"
-import { ESTADO_LABELS} from "../../../types/IPedido"
+import { useState, useEffect } from "react"
+import type { IPedido, EstadoPedido, IHistorialEstado } from "../../../types/IPedido"
+import { ESTADO_LABELS, TRANSICIONES_VALIDAS} from "../../../types/IPedido"
 import { StatusBadge } from "../../../ui/StatusBadge"
 import { useQuery } from "@tanstack/react-query"
-import { getDetallesPedido } from "../../../api/pedidosApi"
+import { getDetallesPedido, getHistorialPedido } from "../../../api/pedidosApi"
+import { MotivoCard } from "./MotivoCard"
 
 const ESTADO_VARIANT: Record<EstadoPedido, "primary" | "secondary" | "success" | "warning" | "error" > = {
     PENDIENTE: "warning",
@@ -27,13 +29,24 @@ interface KanbanCardProps {
     isExpanded: boolean
     onClick: ()=> void
     onAvanzar: ()=> void
+    onCancelar: (motivo: string)=> void
+    onCancelConfirmReset: ()=> void
+    isCancelConfirm: boolean
     isLoading: boolean
 }
 
+
 // Tarjeta de pedido tiene 2 modos colapsado y expandido
-export function KanbanCard({ pedido, isExpanded, onClick, onAvanzar, isLoading }: KanbanCardProps) {
+export function KanbanCard({ pedido, isExpanded, onClick, onAvanzar, onCancelar, onCancelConfirmReset, isCancelConfirm, isLoading }: KanbanCardProps) {
     const botonLabel = BOTON_LABEL [pedido.estado_codigo]
+    const [motivo, setMotivo] = useState("")
+
+    useEffect(() => {
+        if (!isCancelConfirm) setMotivo("")
+    }, [isCancelConfirm])
+
     const esTerminal = pedido.estado_codigo === "ENTREGADO" || pedido.estado_codigo === "CANCELADO"
+    const puedeCancelar = TRANSICIONES_VALIDAS [pedido.estado_codigo].includes("CANCELADO")
 
     const { data: detalles, isLoading: isLoadingDetalles, isError: isErrorDetalles } = useQuery ({
         queryKey: ["detallesPedido", pedido.id],
@@ -132,12 +145,14 @@ export function KanbanCard({ pedido, isExpanded, onClick, onAvanzar, isLoading }
             </div>
 
             {/* Boton avanzar */}
-            {!esTerminal && botonLabel && (
-                <div className= "px-4 pb-4">
+            {!esTerminal && (
+                <div className="px-4 pb-4 flex flex-col gap-2">
+                    
+                    {botonLabel && (
                     <button
                         onClick= {onAvanzar}
                         disabled={isLoading}
-                        className= "w-full bg-primary-container text-on-primary-container py-3 rounded-xl text-label-lg font-semibold flex items-center justify-center gap-2 hover-brightness-110 active:scale-[0.98] transition-all disabled:opacity-50">
+                        className= "w-full bg-primary-container text-on-primary-container py-3 rounded-xl text-label-lg font-semibold flex items-center justify-center gap-2 hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50">
 
                         {isLoading ? (
                             <span className= "material-symbols-outlined animate-spin text-[18px] overflow-hidden">progress_activity</span>
@@ -147,15 +162,54 @@ export function KanbanCard({ pedido, isExpanded, onClick, onAvanzar, isLoading }
                         {isLoading ? "Actualizando..." : botonLabel}
 
                     </button>
-                </div>
             )}
 
+            {puedeCancelar && !isCancelConfirm && (
+                <button
+                    onClick = {()=> onCancelar("")}
+                    disabled = {isLoading}
+                    className = "w-full py-2 rounded-xl text-label-md text-error border border-error/30 hover:bg-error-container hover:text-on-error-container transition-colors disabled:opacity-50">
+                        Cancelar pedido
+                    </button>
+            )}
+
+            {puedeCancelar && isCancelConfirm && (
+                <div className= "flex flex-col gap-2">
+                    <p className= "text-label-md text-error text-center"> ¿Confirmar cancelacion?</p>
+                    <input
+                        type= "text"
+                        placeholder= "Motivo de cancelacion (requerido)"
+                        value={motivo}
+                        onChange= {(e)=> setMotivo(e.target.value)}
+                        className = "w-full px-3 py-2 rounded-lg border border-error/30 text-body-sm bg-surface-container text-on-surface focus:outline-none focus:border-error"
+                    />
+                    <div className= "flex gap-2">
+                        <button
+                            onClick= {onCancelConfirmReset}
+                            className= "flex-1 py-2 rounded-xl text-label-md border border-outline-variant text-secondary hover:bg-surface-container transition-colors">
+                                No
+                        </button>
+                        <button
+                            onClick= {() => onCancelar(motivo)}
+                            disabled= {isLoading || !motivo.trim()}
+                            className = "flex-1 py-2 rounded-xl text-label-md bg-error text-on-error hover:brightness-110 transition-all disabled:opacity-50">
+                                {isLoading ? "Cancelando..." : "Si, cancelar"}
+                        </button>
+                    </div>
+                </div>
+            )}
+        </div>
+            )}
             {esTerminal && (
                 <div className= "px-4 pb-4">
+                    {pedido.estado_codigo === "CANCELADO" ? (
+                        <MotivoCard pedidoId ={pedido.id} isExpanded= {isExpanded}/>
+                    ) : (
                     <div className = "w-full py-3 rounded-xl text-label-lg flex items-center justify-center gap-2 bg-surface-container text-secondary">
                         <span className="material-symbols-outlined text-[18px] overflow-hidden">check_circle</span>
                         Pedido finalizado
                     </div>
+                    )}
                 </div>
             )}
         </article>
