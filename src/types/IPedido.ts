@@ -12,7 +12,7 @@ export type EstadoPedido =
 export const ESTADO_LABELS: Record<EstadoPedido, string> = {
   PENDIENTE:  "Pendiente",
   CONFIRMADO: "Confirmado",
-  EN_PREP:    "En preparación",
+  EN_PREP:    "En cocina",
   LISTO:      "Listo",
   ENTREGADO:  "Entregado",
   CANCELADO:  "Cancelado",

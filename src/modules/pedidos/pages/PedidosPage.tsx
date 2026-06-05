@@ -7,6 +7,7 @@ import { TRANSICIONES_VALIDAS } from "../../../types/IPedido"
 import { KanbanColumn } from "../components/KabanColumn"
 import { PageHeader } from "../../../ui/PageHeader"
 import { Notification } from "../../../ui/Notification"
+import { PedidosFinalizadosModal, DetalleItems, DetalleMotivo } from "../components/PedidosFinalizadosModal"
 
 //Orden en que aparecen las columnas
 const ESTADOS_ORDENADOS: EstadoPedido[] = [
@@ -14,8 +15,6 @@ const ESTADOS_ORDENADOS: EstadoPedido[] = [
     "CONFIRMADO",
     "EN_PREP",
     "LISTO",
-    "ENTREGADO",
-    "CANCELADO",
 ]
 
 // Tablero de gestion
@@ -31,6 +30,9 @@ export function PedidosPage() {
     const [ loadingId, setLoadingId ] = useState <number | null> (null)
 
     const [ cancelConfirmId, setCancelConfirmId] = useState <number | null > (null)
+
+    const [showEntregados, setShowEntregados] = useState (false)
+    const [showCancelados, setShowCancelados] = useState (false)
 
     const { data, isLoading, isError } = useQuery ({
         queryKey: ["pedidos"],
@@ -103,6 +105,9 @@ export function PedidosPage() {
         {} as Record<EstadoPedido, IPedido []>
     )
 
+    const entregados = (data?.data ?? []).filter(p => p.estado_codigo === "ENTREGADO")
+    const cancelados  = (data?.data ?? []).filter(p => p.estado_codigo === "CANCELADO")
+    
     return (
         <div className= "p-8 flex flex-col">
 
@@ -110,6 +115,24 @@ export function PedidosPage() {
                 title= "Gestion de Pedidos"
                 subtitle= "Tablero de control de pedidos en tiempo real"
             />
+
+            <div className= "flex gap-3 mb-6">
+                <button
+                    onClick= { () => setShowEntregados(true)}
+                    className = "flex items-center gap-2 px-4 py-2 rounded-full border border-success/40 bg-success/10 text-success text-label-md font-medium hover:bg-success/20 transition-colors">
+                    <span className= "w-2 h-2 rounded-full bg-success inline-block" />
+
+                    Entregados ({entregados.length})
+                </button>
+
+                <button
+                    onClick= {() => setShowCancelados (true)}
+                    className= "flex items-center gap-2 px-4 py-2 rounded-full border border-error/40 bg-error/10 text-error text-label-md font-medium hover:bg-error/20 transition-colors">
+                    <span className= "w-2 h-2 rounded-full bg-error inline-block" />
+
+                    Cancelados ({cancelados.length})
+                </button>
+            </div>
 
             {isLoading && (
                 <div className= "flex items-center justify-center py-16 gap-3 text-secondary">
@@ -144,6 +167,28 @@ export function PedidosPage() {
                     ))}
                 </div>
             )}
+
+            <PedidosFinalizadosModal
+                isOpen= {showEntregados}
+                onClose= {()=> setShowEntregados(false)}
+                title= "Pedidos Entregados"
+                pedidos= {entregados}
+                estadoLabel= "Entregado"
+                estadoColor= "success"
+                expandLabel= "Ver detalle"
+                renderExpanded= {(id) => <DetalleItems pedidoId = {id} />}
+            />
+
+            <PedidosFinalizadosModal
+                isOpen={showCancelados}
+                onClose={() => setShowCancelados(false)}
+                title="Pedidos Cancelados"
+                pedidos={cancelados}
+                estadoLabel="Cancelado"
+                estadoColor="error"
+                expandLabel="Ver motivo"
+                renderExpanded={(id) => <DetalleMotivo pedidoId={id} />}
+            />
 
             <Notification mensajeExito= {mensajeExito} mensajeError= {mensajeError} />
         </div>
