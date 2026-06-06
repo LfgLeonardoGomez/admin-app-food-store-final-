@@ -7,8 +7,8 @@ import { KanbanCard } from "./KanbanCard"
 const COLUMN_ACCENT: Record <EstadoPedido, string> = {
     PENDIENTE:  "border-t-warning",
     CONFIRMADO: "border-t-primary",
-    EN_PREP:    "border-t-primary",
-    LISTO:      "border-t-secondary",
+    EN_PREP:    "border-t-primary-container",
+    LISTO:      "border-t-tertiary",
     ENTREGADO:  "border-t-success",
     CANCELADO:  "border-t-error",
 }

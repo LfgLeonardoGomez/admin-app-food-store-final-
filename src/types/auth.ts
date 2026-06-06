@@ -1,4 +1,4 @@
-export type Rol = "ADMIN" | "STOCK" | "PEDIDOS" | "CLIENT"
+export type Rol = "ADMIN" | "STOCK" | "PEDIDOS" | "COCINERO" | "CLIENT"
 
 export interface AuthUser {
     id: number

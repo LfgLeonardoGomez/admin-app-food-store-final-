@@ -29,9 +29,9 @@ interface KanbanCardProps {
     isExpanded: boolean
     onClick: ()=> void
     onAvanzar: ()=> void
-    onCancelar: (motivo: string)=> void
-    onCancelConfirmReset: ()=> void
-    isCancelConfirm: boolean
+    onCancelar?: (motivo: string)=> void
+    onCancelConfirmReset?: ()=> void
+    isCancelConfirm?: boolean
     isLoading: boolean
 }
 
@@ -43,10 +43,10 @@ export function KanbanCard({ pedido, isExpanded, onClick, onAvanzar, onCancelar,
 
     useEffect(() => {
         if (!isCancelConfirm) setMotivo("")
-    }, [isCancelConfirm])
+    }, [isCancelConfirm ?? false])
 
     const esTerminal = pedido.estado_codigo === "ENTREGADO" || pedido.estado_codigo === "CANCELADO"
-    const puedeCancelar = TRANSICIONES_VALIDAS [pedido.estado_codigo].includes("CANCELADO")
+    const puedeCancelar = !!onCancelar && TRANSICIONES_VALIDAS[pedido.estado_codigo].includes("CANCELADO")
 
     const { data: detalles, isLoading: isLoadingDetalles, isError: isErrorDetalles } = useQuery ({
         queryKey: ["detallesPedido", pedido.id],

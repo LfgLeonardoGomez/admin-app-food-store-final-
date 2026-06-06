@@ -24,6 +24,7 @@ const NAV_ITEMS: NavItem[] = [
     { label: "Ingredientes", to: ROUTES.INGREDIENTES, roles: ["ADMIN"], icon: "inventory_2"},
     { label: "Productos", to: ROUTES.PRODUCTOS, roles: ["ADMIN","STOCK"], icon: "local_pizza"},
     { label: "Pedidos", to: ROUTES.PEDIDOS, roles: ["ADMIN","PEDIDOS"], icon: "shopping_cart"},
+    { label: "Cocina", to: ROUTES.COCINA, roles: ["ADMIN","COCINERO"], icon: "soup_kitchen"},
 ]
 
 export function Sidebar(){

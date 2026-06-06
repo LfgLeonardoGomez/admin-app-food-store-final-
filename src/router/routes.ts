@@ -5,6 +5,7 @@ export const ROUTES = {
     INGREDIENTES: '/ingredientes',
     PRODUCTOS: '/productos',
     PEDIDOS: '/pedidos',
+    COCINA: '/cocina',
     FORBIDDEN: '/forbidden',
 
 }  as const

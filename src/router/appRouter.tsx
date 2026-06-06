@@ -8,7 +8,7 @@ import { LoginPage } from "../modules/auth/pages/LoginPage"
 import { CategoriasPage } from "../modules/categorias"
 import { IngredientesPage } from "../modules/ingredientes"
 import { ProductosPage } from "../modules/productos"
-import { PedidosPage } from "../modules/pedidos"
+import { PedidosPage, CocineroPage } from "../modules/pedidos"
 import { DashboardPage } from "../modules/dashboard"
 
 /**
@@ -57,6 +57,11 @@ export const AppRouter = () => {
             {/* ADMIN - PEDIDOS */}
             <Route element={<ProtectedRoute allowedRoles={["ADMIN", "PEDIDOS"]} />}>
               <Route path={ROUTES.PEDIDOS} element={<PedidosPage />} />
+            </Route>
+
+            {/* ADMIN - COCINERO */}
+            <Route element={<ProtectedRoute allowedRoles={["ADMIN", "COCINERO"]} />}>
+              <Route path={ROUTES.COCINA} element={<CocineroPage />} />
             </Route>
 
           </Route>

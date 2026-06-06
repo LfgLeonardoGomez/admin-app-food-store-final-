@@ -5,6 +5,8 @@ import { getCategorias } from "../../../api/categoriasApi"
 import { getPedidosPorEstado } from "../../../api/pedidosApi"
 import { StatCard } from "../../../ui/StatCard"
 import { PageHeader } from "../../../ui/PageHeader"
+import { PedidosEstadoChart } from "../components/PedidosEstadoChart"
+import { ProductosChart } from "../components/ProductosChart"
 
 export function DashboardPage() {
     const user = useAuthStore((s) => s.user)
@@ -20,7 +22,7 @@ export function DashboardPage() {
 
     const { data: categorias } = useQuery({
         queryKey: ["dashboard-categorias"],
-        queryFn: () => getCategorias(0, 1),
+        queryFn: () => getCategorias(),
         enabled: isAdmin,
     })
 
@@ -49,7 +51,7 @@ export function DashboardPage() {
                 {isAdmin && (
                     <StatCard
                         label="Total Categorías"
-                        value={categorias?.count ?? "—"}
+                        value={categorias?.data.length ?? "—"}
                     />
                 )}
 
@@ -60,8 +62,15 @@ export function DashboardPage() {
                         variant="warning"
                     />
                 )}
-
             </div>
+
+            {/* Seccion de graficos*/}
+            {(isAdmin || isPedidos) && (
+                <div className= "grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+                    <ProductosChart />
+                    <PedidosEstadoChart />
+                </div>
+            )}
         </div>
     )
 }
