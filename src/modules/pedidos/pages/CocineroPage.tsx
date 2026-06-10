@@ -150,6 +150,7 @@ export function CocineroPage() {
                                             onClick={() => handleExpand(pedido.id)}
                                             onAvanzar={() => handleAvanzar(pedido)}
                                             isLoading={loadingId === pedido.id}
+                                            puedeAvanzar= {estado === "CONFIRMADO" || estado ==="EN_PREP"}
                                         />
                                     ))
                                 )}
