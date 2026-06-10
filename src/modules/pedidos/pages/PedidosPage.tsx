@@ -1,13 +1,15 @@
-import { useState } from "react"
+import { useState, useCallback} from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { getPedidos, cambiarEstadoPedido } from "../../../api/pedidosApi"
 import { useNotification } from "../../../hooks/useNotification"
-import type { IPedido, EstadoPedido } from "../../../types/IPedido"
+import type { IPedido, EstadoPedido, IPedidoList } from "../../../types/IPedido"
 import { TRANSICIONES_VALIDAS } from "../../../types/IPedido"
 import { KanbanColumn } from "../components/KabanColumn"
 import { PageHeader } from "../../../ui/PageHeader"
 import { Notification } from "../../../ui/Notification"
 import { PedidosFinalizadosModal, DetalleItems, DetalleMotivo } from "../components/PedidosFinalizadosModal"
+import { useAuthStore } from "../../../store/useAuthStore"
+import { useOrderStatusWS, type IWsEvent } from "../../../hooks/useOrderStatusWS"
 
 //Orden en que aparecen las columnas
 const ESTADOS_ORDENADOS: EstadoPedido[] = [
@@ -24,6 +26,8 @@ export function PedidosPage() {
     const queryClient = useQueryClient()
     const { mensajeExito, mensajeError, mostrarExito, mostrarError } = useNotification()
 
+    const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
+    
     //Estado local, guarda un solo ID, ya que solo una card puede esta expandida 
     //y solo una puede esta en loading al mismo tiempo
     const [ expandedId, setExpandedId ] = useState <number | null> (null)
@@ -37,6 +41,19 @@ export function PedidosPage() {
     const { data, isLoading, isError } = useQuery ({
         queryKey: ["pedidos"],
         queryFn: getPedidos,
+    })
+
+    const { isConnected } = useOrderStatusWS({
+        enabled: isAuthenticated,
+        onMessage: useCallback((msg: IWsEvent) => {
+            if (msg.event === "WS_CONNECTED") {
+                queryClient.invalidateQueries({ queryKey: ["pedidos"] })
+                return
+            }
+            if (msg.event.startsWith("PEDIDO_") || msg.event === "NUEVO_PEDIDO") {
+                queryClient.invalidateQueries({ queryKey: ["pedidos"] })
+            }
+        }, [queryClient])
     })
 
     // Llama al endpoint, si tiene extio invalida el cache para que React re-fetche
@@ -116,6 +133,13 @@ export function PedidosPage() {
                 subtitle= "Tablero de control de pedidos en tiempo real"
             />
 
+            {!isConnected && (
+                <div className= "flex items-center gap-2 px-3 py-2 mb-4 rounded-lg bg-error-container text-on-error-container text-sm">
+                    <span className= "material-symbols-outlined text-base">wifi_off</span>
+                    Sin conexion en tiempo real
+                </div>
+            )}
+
             <div className= "flex gap-3 mb-6">
                 <button
                     onClick= { () => setShowEntregados(true)}
@@ -163,6 +187,7 @@ export function PedidosPage() {
                             onAvanzar = {handleAvanzar}
                             onCancelar={handleCancelar}
                             onCancelConfirmReset = {() => setCancelConfirmId(null)}
+                            ocultarBotonAvanzar = {estado === "CONFIRMADO" || estado === "EN_PREP"}
                         />
                     ))}
                 </div>

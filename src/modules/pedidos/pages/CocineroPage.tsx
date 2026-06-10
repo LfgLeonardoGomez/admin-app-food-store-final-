@@ -1,16 +1,23 @@
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { getPedidos, cambiarEstadoPedido } from "../../../api/pedidosApi"
 import { useNotification } from "../../../hooks/useNotification"
-import type { IPedido, EstadoPedido } from "../../../types/IPedido"
+import type { IPedido, EstadoPedido, IPedidoList} from "../../../types/IPedido"
 import { TRANSICIONES_VALIDAS, ESTADO_LABELS } from "../../../types/IPedido"
 import { PageHeader } from "../../../ui/PageHeader"
 import { Notification } from "../../../ui/Notification"
 import { PedidosFinalizadosModal, DetalleItems } from "../components/PedidosFinalizadosModal"
 import { KanbanCard } from "../components/KanbanCard"
+import { useOrderStatusWS, type IWsEvent } from "../../../hooks/useOrderStatusWS"
+import { useAuthStore } from "../../../store/useAuthStore"
 
 // Solo los estados visibles del tablero
-const ESTADOS_ORDENADOS: EstadoPedido[] = ["CONFIRMADO", "EN_PREP", "LISTO"]
+const ESTADOS_ORDENADOS: EstadoPedido[] = [
+    "CONFIRMADO", 
+    "EN_PREP", 
+    "LISTO"
+]
+
 // No reutiliza KabanColumn porque usa un subconjunto de estados distintos
 const COLUMN_ACCENT: Partial<Record<EstadoPedido, string>> = {
     CONFIRMADO: "border-t-primary",
@@ -31,6 +38,8 @@ export function CocineroPage() {
         queryFn: getPedidos,
     })
 
+    const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
+
     const avanzarMutation = useMutation({
         mutationFn: ({ pedidoId, estadoHacia }: { pedidoId: number; estadoHacia: EstadoPedido }) =>
             cambiarEstadoPedido(pedidoId, { estado_hacia: estadoHacia }),
@@ -43,6 +52,19 @@ export function CocineroPage() {
             mostrarError("Error al actualizar el estado")
             setLoadingId(null)
         }
+    })
+
+    const{ isConnected } = useOrderStatusWS({
+        enabled: isAuthenticated,
+        onMessage: useCallback((msg: IWsEvent) => {
+            if (msg.event === "WS_CONNECTED") {
+                queryClient.invalidateQueries({ queryKey: ["pedidos"] })
+                return
+            }
+            if (msg.event.startsWith("PEDIDO_") || msg.event === "NUEVO_PEDIDO") {
+                queryClient.invalidateQueries({ queryKey: ["pedidos"] })
+            }
+        }, [queryClient])
     })
 
     const handleAvanzar = (pedido: IPedido) => {
@@ -73,6 +95,12 @@ export function CocineroPage() {
                 subtitle="Pedidos en preparacion"
             />
 
+            {!isConnected && (
+                <div className= "flex items-center gap-2 px-3 py-2 mb-4 rounded-lg bg-error-container text-on-error-container text-sm">
+                    <span className= "material-symbols-outlined text-base">wifi_off</span>
+                    Sin conexion en tiempo real
+                </div>
+            )}
             <div className="flex gap-3 mb-6">
                 <button
                     onClick={() => setShowTerminados(true)}

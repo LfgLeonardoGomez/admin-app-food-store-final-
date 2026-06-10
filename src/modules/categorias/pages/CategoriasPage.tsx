@@ -24,7 +24,7 @@ export function CategoriasPage() {
   const isAdmin = useAuthStore((s) => s.hasRole("ADMIN"))
 
   const [page, setPage] = useState(0)
-  const LIMIT = 5
+  const LIMIT = 10
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   /** undefined = crear nueva, ICategoria = editar existente */

@@ -33,12 +33,13 @@ interface KanbanCardProps {
     onCancelConfirmReset?: ()=> void
     isCancelConfirm?: boolean
     isLoading: boolean
+    puedeAvanzar?: boolean
 }
 
 
 // Tarjeta de pedido tiene 2 modos colapsado y expandido
-export function KanbanCard({ pedido, isExpanded, onClick, onAvanzar, onCancelar, onCancelConfirmReset, isCancelConfirm, isLoading }: KanbanCardProps) {
-    const botonLabel = BOTON_LABEL [pedido.estado_codigo]
+export function KanbanCard({ pedido, isExpanded, onClick, onAvanzar, onCancelar, onCancelConfirmReset, isCancelConfirm, isLoading, puedeAvanzar = true }: KanbanCardProps) {
+    const botonLabel = puedeAvanzar ? BOTON_LABEL [pedido.estado_codigo] : undefined
     const [motivo, setMotivo] = useState("")
 
     useEffect(() => {

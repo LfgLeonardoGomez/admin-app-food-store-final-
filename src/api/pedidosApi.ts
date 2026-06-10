@@ -16,9 +16,11 @@ export const getPedidosPorEstado = async (estado: string): Promise<IPedidoList> 
   return data
 }
 
-//Registra una transición de estado en el historial
 export const cambiarEstadoPedido = async ( pedidoId: number, payload: ICambioEstadoPayload): Promise<void> => {
-  await apiClient.post(`/historialpedidos/${pedidoId}/historial`, payload)
+  await apiClient.patch(`/pedidos/${pedidoId}/estado`, { 
+    nuevo_estado: payload.estado_hacia, 
+    motivo: payload.motivo ?? null
+  })
 }
 
 export const getDetallesPedido = async (pedidoId: number): Promise <IDetallePedidoList> => {

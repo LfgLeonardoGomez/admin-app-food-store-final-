@@ -24,10 +24,11 @@ interface KanbanColumnProps {
     onAvanzar: (pedido: IPedido) => void
     onCancelar: (pedido: IPedido, motivo: string) => void
     onCancelConfirmReset: () => void
+    ocultarBotonAvanzar?: boolean
 }
 
 // Recibe los pedidos ya filtrados y delega el estado a la PedidosPage
-export function KanbanColumn ({ estado, pedidos, expandedId, loadingId, cancelConfirmId, onExpand, onAvanzar, onCancelar, onCancelConfirmReset}: KanbanColumnProps){
+export function KanbanColumn ({ estado, pedidos, expandedId, loadingId, cancelConfirmId, onExpand, onAvanzar, onCancelar, onCancelConfirmReset, ocultarBotonAvanzar}: KanbanColumnProps){
     return (
         <div className={`flex flex-col w-72 shrink-0 bg-surface-container-low rounded-xl border-t-4 ${COLUMN_ACCENT[estado]} border border-outline-variant`}>
 
@@ -53,6 +54,7 @@ export function KanbanColumn ({ estado, pedidos, expandedId, loadingId, cancelCo
                             onCancelConfirmReset = {onCancelConfirmReset}
                             isCancelConfirm = {cancelConfirmId === pedido.id}
                             isLoading= {loadingId === pedido.id}
+                            puedeAvanzar = {!ocultarBotonAvanzar}
                         />
                     ))
                 )}
