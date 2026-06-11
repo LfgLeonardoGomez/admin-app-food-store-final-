@@ -1,4 +1,5 @@
 import { useAuthStore } from "../../store/useAuthStore"
+import { useWsStore } from "../../store/wsStore"
 
 /**
  * Barra superior de la pagina autenticada
@@ -14,6 +15,8 @@ interface Props {
 export function AdminHeader({searchPlaceholder = "Buscar ... "}: Props) {
     const user = useAuthStore((s)=>s.user)
     const logout = useAuthStore((s)=> s.logout)
+
+    const isConnected = useWsStore((s) => s.isConnected)
 
     if (!user) return null
 
@@ -42,6 +45,17 @@ export function AdminHeader({searchPlaceholder = "Buscar ... "}: Props) {
             {/* Derecha */}
             <div className="flex items-center gap-md">
 
+                {/* Badge WS  */}
+                <div className= {`flex items-center gap-1.5 px-3 py-1 rounded-full text-label-sm font-medium border transition-colors
+                    ${isConnected
+                        ? 'bg-green-50 border-green-200 text-green-700'
+                        : 'bg-surface-container border-outline-variant text-secondary'
+                    }`}
+                >
+                    <span className= {`w-2 h-2 rounded-full ${isConnected ? 'bg-greeen-500 aanimate-pulse' : 'bg-outline-variant'}`} />
+                    {isConnected ? 'En tiempo real' : 'Sin conexion WS'}
+                </div>
+                
                 {/* Notificaciones */}
                 <button type="button" className="p-2 text-secondary hover:bg-surface-container-low rounded-full transition-colors">
                     <span className="material-symbols-outlined">notifications</span>
