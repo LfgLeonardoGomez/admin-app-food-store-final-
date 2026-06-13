@@ -36,10 +36,10 @@ export function Sidebar(){
     )
 
     return (
-        <aside className="flex h-screen w-64 flex-col border-r border-outline-variant bg-surface px-md gap-sm">
+        <aside className="flex h-screen w-48 flex-col border-r border-outline-variant bg-surface px-md gap-sm">
 
             {/* Logo / Nombre */}
-            <div className= "flex items-center gap-sm mb-lg px-xs">
+            <div className= "flex items-center gap-sm mb-lg px-xs mt-lg">
                 <div className= "w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center text-on-primary-container">
                     <span className="material-symbols-outlined">local_pizza</span>
                 </div>

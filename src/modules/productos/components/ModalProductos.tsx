@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createProducto, updateProducto, updateProductoStock, updateProductoCategorias} from "../../../api/productosApi"
 import { getCategorias } from "../../../api/categoriasApi"
@@ -7,6 +7,7 @@ import { useNotification } from "../../../hooks/useNotification"
 import { Notification } from "../../../ui/Notification"
 import { INPUT_MT } from "../../../ui/fieldClasses"
 import type { IProducto, IProductoCreate } from "../../../types/IProducto"
+import { uploadImagen, deleteImagen } from "../../../api/uploadsApi"
 
 interface ModalProductosProps {
     isOpen: boolean
@@ -40,6 +41,11 @@ export function ModalProductos({ isOpen, onClose, productoToEdit, stockOnly = fa
 
     const [selectedCategorias, setSelectedCategorias] = useState<number []>([])
 
+    //integracion de cloudinary
+    const [isUploading, setIsUploading] = useState(false)
+    const [currentPublicId, setCurrentPublicId] = useState <string | null>(null)
+    const fileInputRef = useRef <HTMLInputElement>(null)
+
     const { data: categoriasData } = useQuery({
         queryKey: ["categorias-all"],
         queryFn: () => getCategorias(0, 100),
@@ -67,6 +73,26 @@ export function ModalProductos({ isOpen, onClose, productoToEdit, stockOnly = fa
     const toggleCategoria = (id: number) => {
         setSelectedCategorias((prev) => prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
         )
+    }
+    //CLOUDINARY
+    const handleFileChange = async (e: React.ChangeEvent <HTMLInputElement>) => {
+        const file = e.target.files?. [0]
+        if (!file) return
+        setIsUploading(true)
+        try {
+            const result = await uploadImagen (file, "productos")
+            setFormState((prev) => ({ ...prev, imagen_url: result.secure_url}))
+            setCurrentPublicId(result.public_id)
+        } catch {
+            mostrarError("Error al subir la imagen")
+        } finally {
+            setIsUploading(false)
+            if (fileInputRef.current) fileInputRef.current.value = ""
+        }
+    }
+    const handleRemoveImagen = () => {
+        setFormState((prev) => ({ ...prev, imagen_url: ""}))
+        setCurrentPublicId(null)
     }
 
     const buildPayload = (): IProductoCreate => ({
@@ -173,27 +199,42 @@ export function ModalProductos({ isOpen, onClose, productoToEdit, stockOnly = fa
                                     name="descripcion"
                                     value={formState.descripcion}
                                     onChange={handleChange}
-                                    rows={2}
+                                    rows={1}
                                     disabled={isPending}
                                     placeholder="Descripción opcional..."
                                     className={INPUT_MT}
                                 />
                             </div>
-
-                            <div>
-                                <label className="block text-label-lg text-on-surface-variant">Precio base</label>
-                                <input
-                                    type="text"
-                                    name="precio_base"
-                                    value={formState.precio_base}
-                                    onChange={handleChange}
-                                    required
-                                    disabled={isPending}
-                                    placeholder="Ej: 12000"
-                                    className={INPUT_MT}
-                                />
+                            
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-label-lg text-on-surface-variant">Precio base</label>
+                                    <input
+                                        type="text"
+                                        name="precio_base"
+                                        value={formState.precio_base}
+                                        onChange={handleChange}
+                                        required
+                                        disabled={isPending}
+                                        placeholder="Ej: 12000"
+                                        className={INPUT_MT}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-label-lg text-on-surface-variant">Stock</label>
+                                    <input
+                                        type="number"
+                                        name="stock_cantidad"
+                                        value={formState.stock_cantidad}
+                                        onChange={handleChange}
+                                        min={0}
+                                        disabled={isPending}
+                                        className={INPUT_MT}
+                                    />
+                                </div>
                             </div>
-
+                          
+                            {/*
                             <div>
                                 <label className="block text-label-lg text-on-surface-variant">URL de imagen</label>
                                 <input
@@ -206,15 +247,62 @@ export function ModalProductos({ isOpen, onClose, productoToEdit, stockOnly = fa
                                     className={INPUT_MT}
                                 />
                             </div>
+                            */}
+                            <div>
+                                <label className= "block text-label-lg text-on-surface-variant"> Imagen</label>
+                                <input
+                                    ref= {fileInputRef}
+                                    type="file"
+                                    accept="image/jpeg, image/png, image/webp"
+                                    className="hidden"
+                                    onChange={handleFileChange}
+                                    disabled={isPending || isUploading}
+                                />
+
+                                {formState.imagen_url ? (
+                                    <div className= "mt-2 flex items-center gap-3">
+                                        <img
+                                            src={formState.imagen_url}
+                                            alt="preview"
+                                            className= "w-16 h-16 rounded-lg object-cover border border-outline-variant"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick= {handleRemoveImagen}
+                                            disabled= {isPending || isUploading}
+                                            className= "text-label-md text-error hover:underline disabled:opacity-50">
+                                                Quitar
+                                            </button>
+                                    </div>
+                                ) : (
+                                    <button
+                                        type= "button"
+                                        onClick= {() => fileInputRef.current?.click()}
+                                        disabled= {isPending || isUploading}
+                                        className= "mt-2 flex items-center gap-2 px-4 py-2 rounded-lg border border-outline-variant text-label-md text-on-surface-variant hover:bg-surface-container disabled:opacity-50">
+                                            {isUploading ? (
+                                                <>
+                                                    <span className="material-symbols-outlined animate-spin text-[18px] overflow-hidden">progress_activity</span>
+                                                    Subiendo...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <span className= "material-symbols-outlined text-[18px] overflow-hidden">upload</span>
+                                                    Subir imagen
+                                                </>
+                                            )}
+                                        </button>  
+                                )}
+                            </div>
 
                             <div>
                                 <label className = "block text-label-lg text-on-surface-variant mb-1"> Categorias</label>
                                 {categoriasData && categoriasData.data.length > 0 ? (
-                                    <div className = "max-h-32 overflow-y-auto bordeer border-outline-variant rounded-lg p-3 space-y-2">
+                                    <div className = "max-h-32 overflow-y-auto border border-outline-variant rounded-lg p-3 grid grid-cols-2 gap-2">
                                         {categoriasData.data.map((cat) => (
                                             <label 
                                                 key= {cat.id}
-                                                className= "lfex itemes-center gap-2 cursor-pointer">
+                                                className= "flex items-center gap-2 cursor-pointer">
                                                     <input
                                                         type="checkbox"
                                                         checked= {selectedCategorias.includes(cat.id)}
@@ -232,19 +320,6 @@ export function ModalProductos({ isOpen, onClose, productoToEdit, stockOnly = fa
                             </div>
                         </>
                     )}
-
-                    <div>
-                        <label className="block text-label-lg text-on-surface-variant">Stock</label>
-                        <input
-                            type="number"
-                            name="stock_cantidad"
-                            value={formState.stock_cantidad}
-                            onChange={handleChange}
-                            min={0}
-                            disabled={isPending}
-                            className={INPUT_MT}
-                        />
-                    </div>
 
                     <div className="flex items-center gap-3 pt-1">
                         <input

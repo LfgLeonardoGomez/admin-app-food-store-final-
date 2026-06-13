@@ -55,7 +55,7 @@ export function LoginPage(){
             </div>                                                      
             <form onSubmit={handleSubmit} className="space-y-md">
                 {error && (
-                    <div className="flex items-center gap-sm rounded-lg bg-error-container px-md-error-container px-md py-sm text-body-md text-on-error-container">
+                    <div className="flex items-center gap-sm rounded-lg bg-error-container px-md py-sm text-body-md text-on-error-container">
                         <span className="material-symbols-outlined text-[18px]">error</span>
                         {error}
                     </div>

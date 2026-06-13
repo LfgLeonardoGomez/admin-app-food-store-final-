@@ -95,12 +95,6 @@ export function CocineroPage() {
                 subtitle="Pedidos en preparacion"
             />
 
-            {!isConnected && (
-                <div className= "flex items-center gap-2 px-3 py-2 mb-4 rounded-lg bg-error-container text-on-error-container text-sm">
-                    <span className= "material-symbols-outlined text-base">wifi_off</span>
-                    Sin conexion en tiempo real
-                </div>
-            )}
             <div className="flex gap-3 mb-6">
                 <button
                     onClick={() => setShowTerminados(true)}

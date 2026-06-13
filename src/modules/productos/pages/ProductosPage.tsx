@@ -11,6 +11,7 @@ import { PageHeader } from "../../../ui/PageHeader"
 import { TableActions } from "../../../ui/TableActions"
 import { Pagination } from "../../../ui/Pagination"
 import { StatusBadge } from "../../../ui/StatusBadge"
+import { deleteImagen, extractPublicIdFromUrl } from "../../../api/uploadsApi"
 import { TH_CLASS, TD_CLASS } from "../../../ui/fieldClasses"
 
 function stockVariant (stock: number): "success" | "warning" | "error" {
@@ -33,7 +34,8 @@ export function ProductosPage () {
     const [ stockOnly, setStockOnly ] = useState(false)
 
     const [isDeleteOpen, setIsDeleteOpen ] = useState(false)
-    const [idToDelete, setIdToDelete ] = useState <number | null >(null)
+    //const [idToDelete, setIdToDelete ] = useState <number | null >(null)
+    const [ productoToDelete, setProductoToDelete ] = useState <IProducto | null> (null)
 
     const {data , isLoading, isError } = useQuery ({
         queryKey: ["productos", page],
@@ -43,12 +45,24 @@ export function ProductosPage () {
     const totalPages= Math.ceil((data?.count ?? 0) / LIMIT)
 
     const deleteMutation = useMutation ({
-        mutationFn: (id:number) => deleteProducto (id),
+        mutationFn: async (prod: IProducto) => {
+            if  (prod.imagen_url) {
+                const publicId = extractPublicIdFromUrl(prod.imagen_url)
+                if (publicId) {
+                    try {
+                        await deleteImagen(publicId) 
+                    } catch {
+                        // ok si ya no existe
+                    }
+                }
+            }
+            await deleteProducto(prod.id)
+        },
         onSuccess: ()=>{
             queryClient.invalidateQueries({ queryKey: ["productos"] })
             mostrarExito("Producto eliminado correctamente")
             setIsDeleteOpen(false)
-            setIdToDelete(null)
+            setProductoToDelete(null)
         },
         onError: ()=> {
             mostrarError ("Error al eliminar el producto")
@@ -68,13 +82,13 @@ export function ProductosPage () {
         setStockOnly(false)
     }
 
-    const handleDelete = (id: number) => {
-        setIdToDelete(id)
+    const handleDelete = (prod: IProducto) => {
+        setProductoToDelete(prod)
         setIsDeleteOpen(true)
     }
 
     const handleConfirmDelete = () => {
-        if (idToDelete !== null) deleteMutation.mutate(idToDelete)
+        if (productoToDelete !== null) deleteMutation.mutate(productoToDelete)
     }
 
     return (
@@ -166,7 +180,7 @@ export function ProductosPage () {
                                                 <td className= {TD_CLASS}>
                                                     <TableActions
                                                         onEdit= {() => handleOpenModal (prod, !isAdmin)}
-                                                        onDelete={isAdmin ? () => handleDelete (prod.id) : undefined}
+                                                        onDelete={isAdmin ? () => handleDelete (prod) : undefined}
                                                         disabled={deleteMutation.isPending}
                                                     />
                                                 </td>
@@ -210,7 +224,7 @@ export function ProductosPage () {
                 title= "Eliminar producto"
                 message= "¿Estás seguro de que queres eliminar este producto?"
                 onConfirm= {handleConfirmDelete}
-                onCancel= { () => {setIsDeleteOpen(false); setIdToDelete (null)}}
+                onCancel= { () => {setIsDeleteOpen(false); setProductoToDelete (null)}}
                 isLoading= {deleteMutation.isPending}
             />
 

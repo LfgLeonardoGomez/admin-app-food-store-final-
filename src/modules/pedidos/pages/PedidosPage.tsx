@@ -133,12 +133,6 @@ export function PedidosPage() {
                 subtitle= "Tablero de control de pedidos en tiempo real"
             />
 
-            {!isConnected && (
-                <div className= "flex items-center gap-2 px-3 py-2 mb-4 rounded-lg bg-error-container text-on-error-container text-sm">
-                    <span className= "material-symbols-outlined text-base">wifi_off</span>
-                    Sin conexion en tiempo real
-                </div>
-            )}
 
             <div className= "flex gap-3 mb-6">
                 <button
