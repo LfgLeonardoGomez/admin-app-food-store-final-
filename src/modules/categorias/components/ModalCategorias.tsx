@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createCategoria, updateCategoria, getCategorias } from "../../../api/categoriasApi"
 import { useForm } from "../../../hooks/useForm"
@@ -6,6 +6,7 @@ import { useNotification } from "../../../hooks/useNotification"
 import { Notification } from "../../../ui/Notification"
 import { INPUT_MT } from "../../../ui/fieldClasses"
 import type { ICategoria, ICategoriaCreate } from "../../../types/ICategoria"
+import { uploadImagen , deleteImagen} from "../../../api/uploadsApi"
 
 interface ModalCategoriasProps {
   isOpen: boolean
@@ -18,12 +19,14 @@ type CategoriaForm = {
   nombre: string
   descripcion: string
   categoria_padre_id: string
+  imagen_url: string
 }
 
 const EMPTY_FORM: CategoriaForm = {
   nombre: "",
   descripcion: "",
   categoria_padre_id: "",
+  imagen_url: "",
 }
 
 /**
@@ -35,6 +38,10 @@ export function ModalCategorias({ isOpen, onClose, categoriaToEdit }: ModalCateg
   const queryClient = useQueryClient()
   const { mensajeExito, mensajeError, mostrarExito, mostrarError } = useNotification()
   const { formState, handleChange, setFormState } = useForm<CategoriaForm>(EMPTY_FORM)
+
+  const [isUploading, setIsUploading] = useState(false)
+  const [ currentPublicId, setCurrentPublicId] = useState <string | null> (null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const { data: categoriasData } = useQuery({
     queryKey: ["categorias"],
@@ -52,17 +59,48 @@ export function ModalCategorias({ isOpen, onClose, categoriaToEdit }: ModalCateg
         nombre: categoriaToEdit.nombre,
         descripcion: categoriaToEdit.descripcion ?? "",
         categoria_padre_id: categoriaToEdit.categoria_padre_id?.toString() ?? "",
+        imagen_url: categoriaToEdit.imagen_url ?? "",
       })
     } else {
       setFormState(EMPTY_FORM)
     }
   }, [categoriaToEdit, isOpen, setFormState])
 
+  //CLOUDINARY
+    const handleFileChange = async (e: React.ChangeEvent <HTMLInputElement>) => {
+        const file = e.target.files?. [0]
+        if (!file) return
+        setIsUploading(true)
+        try {
+            const result = await uploadImagen (file, "categorias")
+            setFormState((prev) => ({ ...prev, imagen_url: result.secure_url}))
+            setCurrentPublicId(result.public_id)
+        } catch {
+            mostrarError("Error al subir la imagen")
+        } finally {
+            setIsUploading(false)
+            if (fileInputRef.current) fileInputRef.current.value = ""
+        }
+    }
+    const handleRemoveImagen = async () => {
+    if (currentPublicId) {
+        try {
+            await deleteImagen(currentPublicId)
+        } catch {
+            mostrarError("No se pudo eliminar la imagen")
+            return
+        }
+    }
+    setFormState((prev) => ({ ...prev, imagen_url: "" }))
+    setCurrentPublicId(null)
+}
+
   /** Convierte el formulario al tipo que espera el backend */
   const buildPayload = (): ICategoriaCreate => ({
     nombre: formState.nombre,
     descripcion: formState.descripcion || null,
     categoria_padre_id: formState.categoria_padre_id ? Number(formState.categoria_padre_id) : null,
+    imagen_url: formState.imagen_url || null,
   })
 
   const createMutation = useMutation({
@@ -166,6 +204,54 @@ export function ModalCategorias({ isOpen, onClose, categoriaToEdit }: ModalCateg
               ))}
             </select>
           </div>
+
+          {/* Cloudinary */}
+          <div>
+            <label className= "block text-label-lg text-on-surface-variant"> Imagen</label>
+              <input
+                ref= {fileInputRef}
+                type="file"
+                accept="image/jpeg, image/png, image/webp"
+                className="hidden"
+                onChange={handleFileChange}
+                disabled={isPending || isUploading}
+              />
+
+              {formState.imagen_url ? (
+                <div className= "mt-2 flex items-center gap-3">
+                  <img
+                    src={formState.imagen_url}
+                    alt="preview"
+                    className= "w-16 h-16 rounded-lg object-cover border border-outline-variant"
+                  />
+                  <button
+                  type="button"
+                  onClick= {handleRemoveImagen}
+                  disabled= {isPending || isUploading}
+                  className= "text-label-md text-error hover:underline disabled:opacity-50">
+                    Quitar
+                  </button>
+                </div>
+                ) : (
+                <button
+                  type= "button"
+                  onClick= {() => fileInputRef.current?.click()}
+                  disabled= {isPending || isUploading}
+                  className= "mt-2 flex items-center gap-2 px-4 py-2 rounded-lg border border-outline-variant text-label-md text-on-surface-variant hover:bg-surface-container disabled:opacity-50">
+                  {isUploading ? (
+                   <>
+                     <span className="material-symbols-outlined animate-spin text-[18px] overflow-hidden">progress_activity</span>
+                       Subiendo...
+                  </>
+                    ) : (
+                   <>
+                      <span className= "material-symbols-outlined text-[18px] overflow-hidden">upload</span>
+                        Subir imagen
+                   </>
+                   )}
+                  </button>  
+                )}
+              </div>
 
           <div className="flex justify-end gap-3 pt-2">
             <button

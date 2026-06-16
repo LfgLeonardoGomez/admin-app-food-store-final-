@@ -41,7 +41,9 @@ export function ModalProductos({ isOpen, onClose, productoToEdit, stockOnly = fa
 
     const [selectedCategorias, setSelectedCategorias] = useState<number []>([])
 
-    //integracion de cloudinary
+    //isUploading bloquea el submit mientras Cloudinary procesa el archivo
+    //currentPublicId se necesita para poder elimianr la imagen 
+    // fileInputRef permite disparar el file picker desde el boton sin exponer el input
     const [isUploading, setIsUploading] = useState(false)
     const [currentPublicId, setCurrentPublicId] = useState <string | null>(null)
     const fileInputRef = useRef <HTMLInputElement>(null)
@@ -74,7 +76,7 @@ export function ModalProductos({ isOpen, onClose, productoToEdit, stockOnly = fa
         setSelectedCategorias((prev) => prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
         )
     }
-    //CLOUDINARY
+    //Sube el archivo a Cloudinary del backend y guarda la URL segura en el form
     const handleFileChange = async (e: React.ChangeEvent <HTMLInputElement>) => {
         const file = e.target.files?. [0]
         if (!file) return
@@ -87,11 +89,21 @@ export function ModalProductos({ isOpen, onClose, productoToEdit, stockOnly = fa
             mostrarError("Error al subir la imagen")
         } finally {
             setIsUploading(false)
+            //resetea el input para permitir seleccionar el mismo archivo de nuevo si el upload fallo
             if (fileInputRef.current) fileInputRef.current.value = ""
         }
     }
-    const handleRemoveImagen = () => {
-        setFormState((prev) => ({ ...prev, imagen_url: ""}))
+    // Elimina la imagen antes de limpiar el estado local
+    const handleRemoveImagen = async () => {
+        if (currentPublicId) {
+            try {
+                await deleteImagen(currentPublicId)
+            } catch {
+                mostrarError ("No se pudo eliminar la imagen")
+                return
+            }
+        }
+        setFormState( (prev) => ({ ...prev, imagen_url: ""}))
         setCurrentPublicId(null)
     }
 
@@ -234,20 +246,7 @@ export function ModalProductos({ isOpen, onClose, productoToEdit, stockOnly = fa
                                 </div>
                             </div>
                           
-                            {/*
-                            <div>
-                                <label className="block text-label-lg text-on-surface-variant">URL de imagen</label>
-                                <input
-                                    type="text"
-                                    name="imagen_url"
-                                    value={formState.imagen_url}
-                                    onChange={handleChange}
-                                    disabled={isPending}
-                                    placeholder="https://... (opcional)"
-                                    className={INPUT_MT}
-                                />
-                            </div>
-                            */}
+                            {/* Upload de imagen - el input nativo esta oculto y se dispara desde el boton*/}
                             <div>
                                 <label className= "block text-label-lg text-on-surface-variant"> Imagen</label>
                                 <input

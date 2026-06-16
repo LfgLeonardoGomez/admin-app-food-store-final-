@@ -4,10 +4,14 @@ import type { AuthUser, AuthState, Rol } from "../types/auth"
 
 /**
  * Estado global de autenticacion
- * 
- * Maneja el ciclo de vida de la sesion.
- * login, logout, verificacion de sesion activa y control de roles
- * 
+ *
+ * Maneja el ciclo de vida de la sesion:
+ * login, logout, verificacion de sesion activa y control de roles.
+ *
+ * No usa middleware persist: el access token viaja en una cookie httpOnly
+ * (inaccesible desde JS por diseño), por lo que no hay nada que persistir
+ * en localStorage. Al recargar la app, checkAuth() llama a GET /auth/me
+ * y restaura la sesion desde la cookie activa.
  */
 
 export const useAuthStore = create<AuthState>()((set, get) => ({
