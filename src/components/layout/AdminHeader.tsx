@@ -52,7 +52,7 @@ export function AdminHeader({searchPlaceholder = "Buscar ... "}: Props) {
                         : 'bg-surface-container border-outline-variant text-secondary'
                     }`}
                 >
-                    <span className= {`w-2 h-2 rounded-full ${isConnected ? 'bg-greeen-500 aanimate-pulse' : 'bg-outline-variant'}`} />
+                    <span className= {`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500 animate-pulse' : 'bg-outline-variant'}`} />
                     {isConnected ? 'En tiempo real' : 'Sin conexion WS'}
                 </div>
                 
