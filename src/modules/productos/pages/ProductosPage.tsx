@@ -195,6 +195,7 @@ export function ProductosPage () {
                             page= {page}
                             totalPages= {totalPages}
                             total= {data.count}
+                            pageSize ={LIMIT}
                             itemLabel="productos"
                             isLoading={isLoading}
                             onPrev={()=> setPage((p) => Math.max (p - 1, 0))}

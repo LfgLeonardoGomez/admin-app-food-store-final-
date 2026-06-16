@@ -144,6 +144,7 @@ export function IngredientesPage() {
               page={page}
               totalPages={totalPages}
               total={data.count}
+              pageSize={LIMIT}
               itemLabel="ingredientes"
               isLoading={isLoading}
               onPrev={() => setPage((p) => Math.max(p - 1, 0))}

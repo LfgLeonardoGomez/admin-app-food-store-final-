@@ -24,7 +24,7 @@ export function CategoriasPage() {
   const isAdmin = useAuthStore((s) => s.hasRole("ADMIN"))
 
   const [page, setPage] = useState(0)
-  const LIMIT = 10
+  const LIMIT = 5
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   /** undefined = crear nueva, ICategoria = editar existente */
@@ -122,7 +122,23 @@ export function CategoriasPage() {
                   {data.data.map((cat) => (
                     <tr key={cat.id} className="hover:bg-surface-container-low transition-colors">
                       <td className={TD_CLASS}>#{cat.id}</td>
-                      <td className={`${TD_CLASS} font-medium text-on-surface`}>{cat.nombre}</td>
+                      <td className={TD_CLASS}>
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded bg-surface-variant flex items-center justify-center shrink-0 overflow-hidden">
+                            {cat.imagen_url ? (
+                              <img
+                                src={cat.imagen_url}
+                                alt={cat.nombre}
+                                className="w-full h-full object-cover"
+                                onError={(e) => { e.currentTarget.style.display = "none" }}
+                              />
+                            ) : (
+                              <span className="material-symbols-outlined text-secondary text-[16px] overflow-hidden">category</span>
+                            )}
+                          </div>
+                          <span className="font-medium text-on-surface">{cat.nombre}</span>
+                        </div>
+                      </td>
                       <td className={TD_CLASS}>
                         <StatusBadge
                           label={cat.categoria_padre_id ? "Subcategoría" : "Categoría"}
@@ -149,6 +165,7 @@ export function CategoriasPage() {
               page={page}
               totalPages={totalPages}
               total={data.count}
+              pageSize={LIMIT}
               itemLabel="categorías"
               isLoading={isLoading}
               onPrev={() => setPage((p) => Math.max(p - 1, 0))}
