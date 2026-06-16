@@ -33,3 +33,10 @@ export const updateProductoStock = async (id: number, body: IProductoStockUpdate
 export const updateProductoCategorias = async (id:number, categorias: number[]): Promise <void> => {
     await apiClient.put(`/productos/${id}/categorias`, {categorias})
 }
+
+export const updateProductoIngredientes = async (
+    id: number,
+    ingredientes: number[]
+): Promise<void> => {
+    await apiClient.put(`/productos/${id}/ingredientes`, { ingredientes })
+}

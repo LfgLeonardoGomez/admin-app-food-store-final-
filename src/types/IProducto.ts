@@ -1,3 +1,9 @@
+export interface IProductoIngrediente {
+    id: number
+    nombre: string
+    es_removible: boolean
+}
+
 export interface IProducto {
     id: number
     nombre: string
@@ -7,7 +13,7 @@ export interface IProducto {
     stock_cantidad: number
     disponible: boolean
     categorias: { id: number; nombre: string }[]
-    ingredientes: { id: number; nombre: string }[]
+    ingredientes: IProductoIngrediente[]
 }
 
 export interface IProductoCreate {
@@ -17,6 +23,7 @@ export interface IProductoCreate {
     imagen_url?: string | null
     stock_cantidad: number
     disponible: boolean
+    unidad_medida_id?: number | null
 }
 
 export interface IProductoUpdate {
