@@ -1,7 +1,7 @@
 import apiClient from "./axiosInstance";
 import type { AuthUser } from "../types/auth";
 
-const AUTH = "/api/v1";
+const AUTH = "/api/v1/auth";
 
 
 /**

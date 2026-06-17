@@ -3,7 +3,7 @@ import { getApiBase } from "../api/config"
 import { useAuthStore } from "../store/useAuthStore"
 import { useWsStore } from "../store/wsStore"
 
-const WS_URL = `${getApiBase().replace(/^http/, "ws")}/pedidos/cocina/ws`
+const WS_URL = `${getApiBase().replace(/^http/, "ws")}/api/v1/pedidos/cocina/ws`
 
 export interface IWsEvent {
     event:
