@@ -66,6 +66,6 @@ Roles disponibles
 Credenciales seed: ver README del Backend (https://github.com/LfgLeonardoGomez/tpPrimerParcial-app-fullstack).
 
 ---
-Video de presentación
-
-[Pendiente — se actualizará antes de la entrega]
+```
+## Video de presentación
+[Video](https://youtu.be/SkHezWvJIcg)
